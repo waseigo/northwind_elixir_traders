@@ -26,6 +26,7 @@ defmodule NorthwindElixirTraders.Employee do
     |> validate_length(:first_name, max: @name_mxlen)
     |> validate_length(:notes, max: @notes_mxlen)
     |> validate_age_range(:birth_date, min: 15, max: 100)
+    |> unique_constraint([:last_name, :first_name, :birth_date])
   end
 
   defp validate_age_range(changeset, field, [min: age_mn, max: age_mx] = opts)
