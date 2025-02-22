@@ -1,1 +1,1 @@
-alias NorthwindElixirTraders.Category
+alias NorthwindElixirTraders.{Repo,Category}
