@@ -21,3 +21,5 @@ northwind_elixir_traders-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+*.db*
