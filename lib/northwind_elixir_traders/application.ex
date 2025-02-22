@@ -8,8 +8,7 @@ defmodule NorthwindElixirTraders.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: NorthwindElixirTraders.Worker.start_link(arg)
-      # {NorthwindElixirTraders.Worker, arg}
+      NorthwindElixirTraders.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
