@@ -21,5 +21,6 @@ defmodule NorthwindElixirTraders.Category do
     |> validate_required(required)
     |> validate_length(:name, max: @name_mxlen)
     |> validate_length(:description, max: @desc_mxlen)
+    |> unique_constraint([:name])
   end
 end
