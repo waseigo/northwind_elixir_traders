@@ -14,5 +14,7 @@ defmodule NorthwindElixirTraders.Repo.Migrations.AlterCategories do
     drop table(:categories)
 
     rename table(:newcats), to: table(:categories)
+    create constraint("categories", "name_maxlength", check: "length(name) <= 50")
+    create constraint("categories", "description_maxlength", check: "length(description) <= 100")
   end
 end
