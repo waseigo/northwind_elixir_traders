@@ -181,7 +181,7 @@ defmodule NorthwindElixirTraders.DataImporter do
   end
 
   def import_all_modeled() do
-    get_tables_to_import() |> Enum.map(&insert_all_from/1)
+    prioritize() |> Enum.map(&model_to_table/1) |> Enum.map(&insert_all_from/1)
   end
 
   def get_modules_of_modeled_tables() do
