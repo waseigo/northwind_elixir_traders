@@ -16,7 +16,7 @@ defmodule NorthwindElixirTraders.Employee do
   end
 
   def changeset(data, params \\ %{}) do
-    permitted = [:last_name, :first_name, :birth_date, :photo, :notes]
+    permitted = [:id, :last_name, :first_name, :birth_date, :photo, :notes]
     required = [:last_name, :first_name, :birth_date]
 
     data
@@ -27,6 +27,7 @@ defmodule NorthwindElixirTraders.Employee do
     |> validate_length(:notes, max: @notes_mxlen)
     |> validate_age_range(:birth_date, min: 15, max: 100)
     |> unique_constraint([:last_name, :first_name, :birth_date])
+    |> unique_constraint([:id])
   end
 
   defp validate_age_range(changeset, field, [min: age_mn, max: age_mx] = opts)
