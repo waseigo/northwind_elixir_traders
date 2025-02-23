@@ -128,4 +128,17 @@ defmodule NorthwindElixirTraders.DataImporter do
         m
     end
   end
+
+  def table_to_internals(table) when is_bitstring(table) do
+    app = __MODULE__ |> Module.split() |> hd
+
+    module =
+      table
+      |> singularize()
+      |> then(&List.insert_at([app], -1, &1))
+      |> Enum.map(&String.to_existing_atom/1)
+      |> Module.concat()
+
+    %{module_name: module, empty_struct: struct(module)}
+  end
 end
