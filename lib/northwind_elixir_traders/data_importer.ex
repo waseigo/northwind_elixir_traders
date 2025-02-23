@@ -83,4 +83,15 @@ defmodule NorthwindElixirTraders.DataImporter do
   def query_actually(table) do
     "SELECT * FROM #{table}" |> IO.inspect()
   end
+
+  def treat_columns(cols, table) when is_list(cols) and is_bitstring(table) do
+    singular = singularize(table)
+
+    Stream.map(cols, fn c ->
+      if String.contains?(c, singular), do: String.replace(c, singular, ""), else: c
+    end)
+    |> Stream.map(&Macro.underscore/1)
+    |> Stream.map(&String.to_atom/1)
+    |> Enum.to_list()
+  end
 end
