@@ -152,4 +152,35 @@ defmodule NorthwindElixirTraders.DataImporter do
     |> Enum.map(&changeset.(&1))
     |> Enum.map(&Repo.insert/1)
   end
+
+  def get_application() do
+    __MODULE__
+    |> Module.split()
+    |> hd()
+    |> List.wrap()
+    |> Module.concat()
+    |> Application.get_application()
+  end
+
+  def get_modules() do
+    get_application()
+    |> :application.get_key(:modules)
+    |> elem(1)
+    |> Enum.map(&(Module.split(&1) |> tl))
+    |> List.flatten()
+  end
+
+  def get_tables_to_import() do
+    plurals = get_modules() |> Enum.map(&pluralize/1)
+
+    table_names()
+    |> elem(1)
+    |> MapSet.new()
+    |> MapSet.intersection(MapSet.new(plurals))
+    |> MapSet.to_list()
+  end
+
+  def import_all_modeled() do
+    get_tables_to_import() |> Enum.map(&insert_all_from/1)
+  end
 end
