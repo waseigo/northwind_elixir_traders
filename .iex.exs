@@ -1,4 +1,4 @@
-alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product}
+alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product,Validations}
 
 import Ecto.Query
 
