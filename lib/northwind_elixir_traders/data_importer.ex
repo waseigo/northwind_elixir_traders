@@ -55,4 +55,14 @@ defmodule NorthwindElixirTraders.DataImporter do
       _ -> singular <> "s"
     end
   end
+
+  def table_names() do
+    {status, r} =
+      nt_query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")
+
+    case {status, r} do
+      {:ok, _} -> {:ok, r |> Map.get(:rows) |> List.flatten()}
+      {_, _} -> {:error, r}
+    end
+  end
 end
