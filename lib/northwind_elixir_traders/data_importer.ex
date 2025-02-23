@@ -219,4 +219,8 @@ defmodule NorthwindElixirTraders.DataImporter do
     |> Enum.sort_by(fn {_, dependencies} -> length(dependencies) end)
     |> Enum.map(fn {k, _v} -> k end)
   end
+
+  def tally() do
+    prioritize() |> Enum.map(&({&1, Repo.all(&1) |> length()})) |> Map.new
+  end
 end
