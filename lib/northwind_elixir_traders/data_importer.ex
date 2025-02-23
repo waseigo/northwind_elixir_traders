@@ -65,4 +65,22 @@ defmodule NorthwindElixirTraders.DataImporter do
       {_, _} -> {:error, r}
     end
   end
+
+  def select_all(table) when is_bitstring(table) do
+    case table_names() do
+      {:ok, nt_table_names} when is_list(nt_table_names) ->
+        if table not in nt_table_names do
+          {:error, "No table named #{table} in #{@database}"}
+        else
+          query_actually(table)
+        end
+
+      {:error, r} ->
+        {:error, r}
+    end
+  end
+
+  def query_actually(table) do
+    "SELECT * FROM #{table}" |> IO.inspect()
+  end
 end
