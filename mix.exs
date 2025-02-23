@@ -21,6 +21,6 @@ defmodule NorthwindElixirTraders.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [{:ecto_sqlite3, "~> 0.15.1"}, {:tzdata, "~> 1.1"}]
+    [{:ecto_sqlite3, "~> 0.18.1"}, {:tzdata, "~> 1.1"}]
   end
 end
