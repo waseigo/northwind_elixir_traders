@@ -183,4 +183,40 @@ defmodule NorthwindElixirTraders.DataImporter do
   def import_all_modeled() do
     get_tables_to_import() |> Enum.map(&insert_all_from/1)
   end
+
+  def get_modules_of_modeled_tables() do
+    get_tables_to_import()
+    |> Enum.map(&table_to_internals/1)
+    |> Enum.map(&Map.get(&1, :module_name))
+  end
+
+  def outbound(module_name) when is_atom(module_name) do
+    module_name
+    |> struct()
+    |> Map.keys()
+    |> Enum.filter(&String.contains?(Atom.to_string(&1), "_id"))
+  end
+
+  def make_dependency_map() do
+    get_modules_of_modeled_tables() |> Enum.map(&{&1, outbound(&1)}) |> Map.new()
+  end
+
+  def gather(erd) when is_map(erd) do
+    Enum.map(erd, fn {k, vl} ->
+      {k, vl |> Enum.map(fn vv -> {vv, Map.get(erd, vv)} end) |> Map.new()}
+    end)
+    |> Map.new()
+  end
+
+  def model_to_table(model) when is_atom(model) do
+    model |> Module.split() |> List.last() |> pluralize()
+  end
+
+  def prioritize() do
+    make_dependency_map()
+    |> gather()
+    |> Enum.map(fn {k, v} -> {k, List.flatten([Map.values(v) | Map.keys(v)])} end)
+    |> Enum.sort_by(fn {_, dependencies} -> length(dependencies) end)
+    |> Enum.map(fn {k, _v} -> k end)
+  end
 end
