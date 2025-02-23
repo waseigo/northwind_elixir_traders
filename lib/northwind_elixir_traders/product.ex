@@ -1,6 +1,7 @@
 defmodule NorthwindElixirTraders.Product do
   use Ecto.Schema
   import Ecto.Changeset
+  alias NorthwindElixirTraders.{Category, Validations}
 
   @name_mxlen 50
 
@@ -21,6 +22,7 @@ defmodule NorthwindElixirTraders.Product do
     |> cast(params, permitted)
     |> validate_required(required)
     |> validate_length(:name, max: @name_mxlen)
+    |> Validations.validate_foreign_key_id(Category, :category_id)
     |> unique_constraint([:name])
   end
 end
