@@ -29,4 +29,11 @@ defmodule NorthwindElixirTraders.DataImporter do
       _ -> switch(@name)
     end
   end
+
+  def nt_query(sql) when is_bitstring(sql) do
+    switch(:nt)
+    result = Repo.query(sql)
+    switch()
+    result
+  end
 end
