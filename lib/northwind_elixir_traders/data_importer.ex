@@ -36,4 +36,23 @@ defmodule NorthwindElixirTraders.DataImporter do
     switch()
     result
   end
+
+  def singularize(plural) when is_bitstring(plural) do
+    ending = String.slice(plural, -3..-1)
+
+    if ending == "ies" do
+      String.replace(plural, ending, "y")
+    else
+      String.trim(plural, "s")
+    end
+  end
+
+  def pluralize(singular) when is_bitstring(singular) do
+    last_char = String.last(singular)
+
+    case last_char do
+      "y" -> String.trim(singular, last_char) <> "ies"
+      _ -> singular <> "s"
+    end
+  end
 end
