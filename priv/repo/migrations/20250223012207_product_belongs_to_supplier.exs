@@ -3,7 +3,7 @@ defmodule NorthwindElixirTraders.Repo.Migrations.ProductBelongsToSupplier do
 
   def change do
     alter table(:products) do
-      add :supplier_id, references(:supplier)
+      add :supplier_id, references(:suppliers)
     end
   end
 end
