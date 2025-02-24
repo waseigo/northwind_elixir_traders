@@ -19,7 +19,7 @@ defmodule NorthwindElixirTraders.Customer do
 
   def changeset(data, params \\ %{}) do
     permitted = [:id, :name, :contact_name, :address, :city, :postal_code, :country]
-    required = permitted |> List.delete(:id)
+    required = permitted -- [:id, :postal_code]
 
     data
     |> cast(params, permitted)
