@@ -221,6 +221,17 @@ defmodule NorthwindElixirTraders.DataImporter do
   end
 
   def tally() do
-    prioritize() |> Enum.map(&({&1, Repo.all(&1) |> length()})) |> Map.new
+    prioritize() |> Enum.map(&{&1, Repo.all(&1) |> length()}) |> Map.new()
+  end
+
+  def teardown() do
+    prioritize()
+    |> Enum.reverse()
+    |> Enum.map(&Repo.delete_all/1)
+  end
+
+  def reset() do
+    teardown()
+    import_all_modeled()
   end
 end
