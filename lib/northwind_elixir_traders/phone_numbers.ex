@@ -1,4 +1,6 @@
 defmodule NorthwindElixirTraders.PhoneNumbers do
+  alias NorthwindElixirTraders.{Repo, Country}
+
   # @url "https://raw.githubusercontent.com/datasets/country-codes/master/data/country-codes.csv"
   # do not use this^
   # this is stable
@@ -43,5 +45,13 @@ defmodule NorthwindElixirTraders.PhoneNumbers do
     |> Enum.filter(fn r -> "" not in r and nil not in r end)
     |> Enum.map(&List.to_tuple(&1))
     |> Enum.map(fn {country, dial, iso} -> {country, String.replace(dial, "-", ""), iso} end)
+  end
+
+  def csv_tuple_to_record({_name, _dial, _alpha3} = country) do
+    [:name, :dial, :alpha3]
+    |> Enum.zip(Tuple.to_list(country))
+    |> Map.new()
+    |> then(&Country.changeset(%Country{}, &1))
+    |> Repo.insert()
   end
 end
