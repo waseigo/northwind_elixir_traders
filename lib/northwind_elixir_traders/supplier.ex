@@ -20,7 +20,7 @@ defmodule NorthwindElixirTraders.Supplier do
 
   def changeset(data, params \\ %{}) do
     permitted = [:id, :name, :contact_name, :address, :city, :postal_code, :country, :phone]
-    required = [:name]
+    required = permitted |> List.delete(:id)
 
     data
     |> cast(params, permitted)

@@ -17,7 +17,7 @@ defmodule NorthwindElixirTraders.Employee do
 
   def changeset(data, params \\ %{}) do
     permitted = [:id, :last_name, :first_name, :birth_date, :photo, :notes]
-    required = [:last_name, :first_name, :birth_date]
+    required = permitted |> List.delete(:id)
 
     data
     |> cast(params, permitted)
