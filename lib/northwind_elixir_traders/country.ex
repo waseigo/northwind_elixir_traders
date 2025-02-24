@@ -4,7 +4,7 @@ defmodule NorthwindElixirTraders.Country do
   # alias NorthwindElixirTraders.{Supplier,Customer} # leave this in for later
 
   @name_mxlen 50
-  @dial_mxlen 5
+  @dial_mxlen 14
 
   schema "countries" do
     field(:name, :string)
