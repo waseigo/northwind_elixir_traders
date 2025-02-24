@@ -1,6 +1,6 @@
 alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product,Validations,DataImporter,Shipper,PhoneNumbers,Country}
 
-import Ecto.Query
+import Ecto.{Query,Changeset}
 
 IEx.configure(inspect: [charlists: :as_lists])
 
