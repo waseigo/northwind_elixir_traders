@@ -181,9 +181,19 @@ defmodule NorthwindElixirTraders.DataImporter do
   end
 
   def import_all_modeled() do
-    Country.import()
+    loglevel = Logger.level()
+    Logger.configure(level: :none)
 
-    prioritize() |> Enum.map(&model_to_table/1) |> Enum.map(&insert_all_from/1)
+    results = Country.import()
+
+    results = [
+      results | prioritize() |> Enum.map(&model_to_table/1) |> Enum.map(&insert_all_from/1)
+    ]
+
+    check = check_all_imported_ok()
+    Logger.configure(level: loglevel)
+
+    {check, results}
   end
 
   def get_modules_of_modeled_tables() do
