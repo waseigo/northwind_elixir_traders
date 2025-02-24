@@ -244,4 +244,17 @@ defmodule NorthwindElixirTraders.DataImporter do
       Map.get(result, :num_rows)
     end
   end
+
+  def count_all_both() do
+    get_tables_to_import()
+    |> Stream.map(fn t -> {t, table_to_internals(t) |> Map.get(:module_name)} end)
+    |> Stream.map(fn {t, m} -> {t, count_nt(t), count_net(m)} end)
+    |> Enum.to_list()
+  end
+
+  def check_all_imported_ok() do
+    count_all_both()
+    |> Enum.reduce(0, fn {_t, a, b}, acc -> acc + a - b end)
+    |> then(&if(&1 == 0, do: :ok, else: :warning))
+  end
 end
