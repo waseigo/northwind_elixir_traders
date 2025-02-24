@@ -236,4 +236,7 @@ defmodule NorthwindElixirTraders.DataImporter do
     teardown()
     import_all_modeled()
   end
+
+  def count_net(m) when is_atom(m), do: Repo.aggregate(m, :count)
+
 end
