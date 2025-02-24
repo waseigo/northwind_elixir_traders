@@ -1,6 +1,6 @@
 defmodule NorthwindElixirTraders.DataImporter do
   require Logger
-  alias NorthwindElixirTraders.Repo
+  alias NorthwindElixirTraders.{Repo, Country}
 
   @name :nt
   @database "NorthwindTraders-original.db"
@@ -181,6 +181,8 @@ defmodule NorthwindElixirTraders.DataImporter do
   end
 
   def import_all_modeled() do
+    Country.import()
+
     prioritize() |> Enum.map(&model_to_table/1) |> Enum.map(&insert_all_from/1)
   end
 
