@@ -1,7 +1,7 @@
 defmodule NorthwindElixirTraders.Employee do
   use Ecto.Schema
   import Ecto.Changeset
-  alias NorthwindElixirTraders.Validations
+  alias NorthwindElixirTraders.{Order, Validations}
 
   @name_mxlen 50
   @notes_mxlen 500
@@ -12,6 +12,7 @@ defmodule NorthwindElixirTraders.Employee do
     field(:birth_date, :date)
     field(:photo, :string)
     field(:notes, :string)
+    has_many(:orders, Order, on_replace: :nilify)
 
     timestamps(type: :utc_datetime)
   end

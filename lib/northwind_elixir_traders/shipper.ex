@@ -1,15 +1,14 @@
 defmodule NorthwindElixirTraders.Shipper do
   use Ecto.Schema
   import Ecto.Changeset
-  # alias NorthwindElixirTraders.Order # doesn't exist yet
-  alias NorthwindElixirTraders.PhoneNumbers
+  alias NorthwindElixirTraders.{Order, PhoneNumbers}
 
   @name_mxlen 50
 
   schema "shippers" do
     field(:name, :string)
     field(:phone, :string)
-    # has_many(:orders, Order, on_replace: :nilify) # the Order module doesn't exist yet
+    has_many(:orders, Order, on_replace: :nilify)
 
     timestamps(type: :utc_datetime)
   end
