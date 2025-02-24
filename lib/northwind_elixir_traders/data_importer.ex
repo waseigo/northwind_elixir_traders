@@ -239,7 +239,8 @@ defmodule NorthwindElixirTraders.DataImporter do
   def teardown() do
     prioritize()
     |> Enum.reverse()
-    |> Enum.map(&Repo.delete_all/1)
+    |> Enum.map(&{&1, Repo.delete_all(&1) |> elem(0)})
+    |> Map.new()
   end
 
   def reset() do
