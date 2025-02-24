@@ -32,4 +32,16 @@ defmodule NorthwindElixirTraders.PhoneNumbers do
     regex = ~r/"([^"]*)"/
     String.replace(row, regex, &(String.replace(&1, ",", "|") |> String.replace("\"", "")))
   end
+
+  def process_csv({:ok, [headings | data]}) do
+    indices =
+      ["CLDR display name", "Dial", "ISO3166-1-Alpha-3"]
+      |> Enum.map(fn colname -> Enum.find_index(headings, &(&1 == colname)) end)
+
+    data
+    |> Enum.map(fn row -> Enum.map(indices, &Enum.at(row, &1)) end)
+    |> Enum.filter(fn r -> "" not in r and nil not in r end)
+    |> Enum.map(&List.to_tuple(&1))
+    |> Enum.map(fn {country, dial, iso} -> {country, String.replace(dial, "-", ""), iso} end)
+  end
 end
