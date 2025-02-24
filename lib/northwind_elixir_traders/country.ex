@@ -27,6 +27,5 @@ defmodule NorthwindElixirTraders.Country do
     |> validate_length(:dial, max: @dial_mxlen)
     |> validate_length(:alpha3, is: 3)
     |> unique_constraint([:name])
-    |> unique_constraint([:alpha3])
   end
 end

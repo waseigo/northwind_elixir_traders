@@ -11,6 +11,5 @@ defmodule NorthwindElixirTraders.Repo.Migrations.CreateCountries do
     end
 
     create unique_index(:countries, [:name])
-    create unique_index(:countries, [:alpha3])
   end
 end
