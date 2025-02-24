@@ -34,4 +34,22 @@ defmodule NorthwindElixirTraders.Country do
     criterion = Keyword.new([{field, value}])
     from(c in __MODULE__, where: ^criterion, select: c.dial) |> Repo.one()
   end
+
+  def get_dial(value) when is_bitstring(value) do
+    dialcodes =
+      [:name, :alpha3]
+      |> Enum.map(&get_dial_by(&1, value))
+      |> Enum.filter(&(not is_nil(&1)))
+
+    case dialcodes do
+      # found by both
+      [a, a] -> a
+      # found by one
+      [a] -> a
+      # not found by either
+      [] -> nil
+      # ambiguous
+      [_a, _b] -> nil
+    end
+  end
 end
