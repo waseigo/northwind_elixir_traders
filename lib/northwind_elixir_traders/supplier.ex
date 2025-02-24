@@ -1,7 +1,7 @@
 defmodule NorthwindElixirTraders.Supplier do
   use Ecto.Schema
   import Ecto.Changeset
-  alias NorthwindElixirTraders.{Product, PhoneNumbers}
+  alias NorthwindElixirTraders.{Product, PhoneNumbers, Validations}
 
   @name_mxlen 50
 
@@ -26,6 +26,7 @@ defmodule NorthwindElixirTraders.Supplier do
     |> cast(params, permitted)
     |> validate_required(required)
     |> validate_length(:name, max: @name_mxlen)
+    |> Validations.validate_country(:country)
     |> PhoneNumbers.validate_phone(:phone, :country)
     |> unique_constraint([:name])
     |> unique_constraint([:id])
