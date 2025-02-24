@@ -31,4 +31,19 @@ defmodule NorthwindElixirTraders.PhoneNumbers do
     readable = make_readable(phone)
     if is_nil(dc), do: nil, else: compose_intl(dc, readable)
   end
+
+  def intlize(phone, country)
+      when is_bitstring(phone) and (is_bitstring(country) or is_nil(country)) do
+    if is_intl?(phone), do: phone, else: handle_phone(phone, country)
+  end
+
+  def validate_phone(changeset, phone_field \\ :phone, country_field \\ nil)
+      when is_map(changeset) and is_atom(phone_field) and is_atom(country_field) do
+    cs_error_keys = changeset |> Map.get(:errors) |> Keyword.keys()
+    errors = Enum.map([phone_field, country_field], &Enum.member?(cs_error_keys, &1))
+
+    if true in errors,
+      do: changeset,
+      else: process_changeset(changeset, phone_field, country_field)
+  end
 end
