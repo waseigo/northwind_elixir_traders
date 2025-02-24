@@ -54,4 +54,10 @@ defmodule NorthwindElixirTraders.PhoneNumbers do
     |> then(&Country.changeset(%Country{}, &1))
     |> Repo.insert()
   end
+
+  def import() do
+    get_csv_rows()
+    |> process_csv()
+    |> Enum.map(&csv_tuple_to_record/1)
+  end
 end
