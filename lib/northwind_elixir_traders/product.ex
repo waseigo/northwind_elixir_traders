@@ -1,7 +1,7 @@
 defmodule NorthwindElixirTraders.Product do
   use Ecto.Schema
   import Ecto.Changeset
-  alias NorthwindElixirTraders.{Category, Validations, Supplier}
+  alias NorthwindElixirTraders.{Category, Validations, Supplier, OrderDetail}
 
   @name_mxlen 50
 
@@ -12,6 +12,7 @@ defmodule NorthwindElixirTraders.Product do
     field(:category_id, :integer)
     belongs_to(:category, Category, define_field: false)
     belongs_to(:supplier, Supplier)
+    has_many(:order_details, OrderDetail)
 
     timestamps(type: :utc_datetime)
   end
