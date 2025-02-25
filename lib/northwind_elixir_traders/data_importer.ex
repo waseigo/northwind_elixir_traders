@@ -255,4 +255,16 @@ defmodule NorthwindElixirTraders.DataImporter do
     |> Enum.reduce(0, fn {_t, a, b}, acc -> acc + a - b end)
     |> then(&if(&1 == 0, do: :ok, else: :warning))
   end
+
+  def fk_to_module(foreign_key) when is_atom(foreign_key) do
+    app = NorthwindElixirTraders.get_application() |> Map.get(:string)
+
+    module_name =
+      foreign_key
+      |> Atom.to_string()
+      |> String.replace("_id", "")
+      |> String.capitalize()
+
+    Module.concat(app, module_name)
+  end
 end
