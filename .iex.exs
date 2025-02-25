@@ -1,4 +1,4 @@
-alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product,Validations,DataImporter,Shipper,PhoneNumbers,Country,Customer,Order,OrderDetail}
+alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product,Validations,DataImporter,Shipper,PhoneNumbers,Country,Customer,Order,OrderDetail,Insights}
 
 import Ecto.{Query,Changeset}
 
