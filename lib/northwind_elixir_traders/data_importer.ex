@@ -267,4 +267,22 @@ defmodule NorthwindElixirTraders.DataImporter do
 
     Module.concat(app, module_name)
   end
+
+  def visit(n, edges, sorted, unvisited) do
+    if n not in unvisited do
+      {sorted, unvisited}
+    else
+      # for each node m ... etc.
+      m = Map.get(edges, n)
+
+      # mark n as visited
+      unvisited = List.delete(unvisited, n)
+      # visit m only when it exists
+      {sorted, unvisited} =
+        if is_nil(m), do: {sorted, unvisited}, else: visit(m, edges, sorted, unvisited)
+
+      # add n to head of sorted
+      {[n | sorted], unvisited}
+    end
+  end
 end
