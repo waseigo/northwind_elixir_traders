@@ -16,7 +16,7 @@ defmodule NorthwindElixirTraders.Order do
 
   def import_changeset(data, params \\ %{}) do
     permitted = [:id, :date, :customer_id, :employee_id, :shipper_id]
-    required = permitted |> List.delete(:id)
+    required = permitted
 
     data
     |> cast(params, permitted)

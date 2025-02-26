@@ -19,7 +19,7 @@ defmodule NorthwindElixirTraders.Employee do
 
   def import_changeset(data, params \\ %{}) do
     permitted = [:id, :last_name, :first_name, :birth_date, :photo, :notes]
-    required = permitted |> List.delete(:id)
+    required = permitted
 
     data
     |> cast(params, permitted)
