@@ -100,7 +100,7 @@ defmodule NorthwindElixirTraders.Country do
     [:name, :dial, :alpha3]
     |> Enum.zip(Tuple.to_list(country))
     |> Map.new()
-    |> then(&changeset(struct(__MODULE__), &1))
+    |> then(&import_changeset(struct(__MODULE__), &1))
     |> Repo.insert()
   end
 
