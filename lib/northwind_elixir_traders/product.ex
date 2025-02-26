@@ -28,6 +28,7 @@ defmodule NorthwindElixirTraders.Product do
     |> validate_length(:name, max: @name_mxlen)
     |> Validations.validate_foreign_key_id(Category, :category_id)
     |> Validations.validate_foreign_key_id(Supplier, :supplier_id)
+    |> validate_number(:price, greater_than_or_equal_to: 1)
     |> unique_constraint([:name])
     |> unique_constraint([:id])
   end
