@@ -64,7 +64,7 @@ defmodule NorthwindElixirTraders.Insights do
     Customer
     |> join(:inner, [c], o in assoc(c, :orders))
     |> group_by([c, o], c.id)
-    |> select([c, o], [c.id, c.name, count(o.id)])
+    |> select([c, o], %{id: c.id, name: c.name, num_orders: count(o.id)})
     |> order_by([c, o], desc: count(o.id))
     |> limit(^n)
     |> Repo.all()
