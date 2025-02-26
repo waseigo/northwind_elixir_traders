@@ -8,7 +8,7 @@ defmodule NorthwindElixirTraders.Product do
   schema "products" do
     field(:name, :string)
     field(:unit, :string)
-    field(:price, :float)
+    field(:price, :integer)
     field(:category_id, :integer)
     belongs_to(:category, Category, define_field: false)
     belongs_to(:supplier, Supplier)
