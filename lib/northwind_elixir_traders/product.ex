@@ -18,7 +18,7 @@ defmodule NorthwindElixirTraders.Product do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(data, params \\ %{}) do
+  def import_changeset(data, params \\ %{}) do
     permitted = [:id, :name, :unit, :price, :category_id, :supplier_id]
     required = permitted |> List.delete(:id)
 

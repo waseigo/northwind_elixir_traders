@@ -18,7 +18,7 @@ defmodule NorthwindElixirTraders.Country do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(data, params \\ %{}) do
+  def import_changeset(data, params \\ %{}) do
     permitted = [:name, :dial, :alpha3]
     required = permitted
 

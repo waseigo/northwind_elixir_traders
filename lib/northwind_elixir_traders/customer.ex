@@ -17,7 +17,7 @@ defmodule NorthwindElixirTraders.Customer do
     timestamps(type: :utc_datetime)
   end
 
-  def changeset(data, params \\ %{}) do
+  def import_changeset(data, params \\ %{}) do
     permitted = [:id, :name, :contact_name, :address, :city, :postal_code, :country]
     required = permitted -- [:id, :postal_code]
 
