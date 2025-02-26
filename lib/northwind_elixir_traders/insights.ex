@@ -38,7 +38,7 @@ defmodule NorthwindElixirTraders.Insights do
       max_concurrency: mc
     )
     |> Enum.to_list()
-    |> Enum.reduce(0.0, fn {_status, value}, acc -> acc + value end)
+    |> Enum.reduce(0, fn {_status, value}, acc -> acc + value end)
   end
 
   def dollarize(cents) when is_number(cents), do: cents / 100
