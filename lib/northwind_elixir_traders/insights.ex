@@ -45,4 +45,18 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def dollarize(cents) when is_number(cents), do: cents / 100
+
+  # for users of Elixir versions below 1.18.0
+  def sum_by(enumerable, mapper)
+
+  def sum_by(list, mapper) when is_list(list) and is_function(mapper, 1) do
+    sum_by_list(list, mapper, 0)
+  end
+
+  def sum_by(enumerable, mapper) when is_function(mapper, 1) do
+    Enum.reduce(enumerable, 0, fn x, acc -> acc + mapper.(x) end)
+  end
+
+  defp sum_by_list([], _, acc), do: acc
+  defp sum_by_list([h | t], mapper, acc), do: sum_by_list(t, mapper, acc + mapper.(h))
 end
