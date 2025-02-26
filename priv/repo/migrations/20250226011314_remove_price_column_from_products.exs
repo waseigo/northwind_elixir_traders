@@ -3,5 +3,6 @@ defmodule NorthwindElixirTraders.Repo.Migrations.RemovePriceColumnFromProducts d
 
   def change do
     alter(table(:products), do: remove(:price))
+    rename(table(:products), :price_cents, to: :price)
   end
 end
