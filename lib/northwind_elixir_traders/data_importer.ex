@@ -94,7 +94,12 @@ defmodule NorthwindElixirTraders.DataImporter do
           # cumulative OR
           |> Enum.reduce(false, fn x, acc -> acc or x end)
 
-        res = r.rows |> Enum.map(&Enum.zip(cols, &1)) |> Enum.map(&Map.new/1)
+        res =
+          r.rows
+          |> Enum.map(&Enum.zip(cols, &1))
+          |> Enum.map(&Map.new/1)
+          |> Enum.map(&treat_price/1)
+
         res = if must_treat_dates?, do: Enum.map(res, &treat_dates/1), else: res
         {:ok, res}
 
@@ -305,5 +310,9 @@ defmodule NorthwindElixirTraders.DataImporter do
     |> List.flatten()
     |> Enum.map(fn {k, v} -> {fk_to_module(k), v} end)
     |> Map.new()
+  end
+
+  def treat_price(m) when is_map(m) do
+    if :price in Map.keys(m), do: %{m | price: round(m.price * 100)}, else: m
   end
 end
