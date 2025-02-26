@@ -1,6 +1,6 @@
 defmodule NorthwindElixirTraders.Insights do
   import Ecto.Query
-  alias NorthwindElixirTraders.{Repo, Product, Order, OrderDetail}
+  alias NorthwindElixirTraders.{Repo, Product, Order, OrderDetail, Customer}
   @timeout 10_000
   @max_concurrency System.schedulers_online()
 
@@ -59,4 +59,14 @@ defmodule NorthwindElixirTraders.Insights do
 
   defp sum_by_list([], _, acc), do: acc
   defp sum_by_list([h | t], mapper, acc), do: sum_by_list(t, mapper, acc + mapper.(h))
+
+  def list_top_n_customers_by_order_count(n \\ 5) when is_integer(n) do
+    Customer
+    |> join(:inner, [c], o in assoc(c, :orders))
+    |> group_by([c, o], c.id)
+    |> select([c, o], [c.id, c.name, count(o.id)])
+    |> order_by([c, o], desc: count(o.id))
+    |> limit(^n)
+    |> Repo.all()
+  end
 end
