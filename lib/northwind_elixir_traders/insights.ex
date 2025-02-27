@@ -98,4 +98,18 @@ defmodule NorthwindElixirTraders.Insights do
       select: %{id: c.id, name: c.name, revenue: sum(od.quantity * p.price)}
     )
   end
+
+  def query_top_n_customers_by_order_revenue(n \\ 5) do
+    from(s in subquery(query_customers_by_order_revenue()),
+      order_by: [desc: s.revenue],
+      limit: ^n
+    )
+  end
+
+  def calculate_top_n_customers_by_order_value(n \\ 5) do
+    from(s in subquery(query_top_n_customers_by_order_revenue(n)),
+      select: sum(s.revenue)
+    )
+    |> Repo.one()
+  end
 end
