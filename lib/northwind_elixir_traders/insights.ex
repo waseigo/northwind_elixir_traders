@@ -116,4 +116,12 @@ defmodule NorthwindElixirTraders.Insights do
         )
         |> Repo.one()
   end
+
+  def count_customers_with_revenues do
+    from(s in subquery(query_customers_by_order_revenue()),
+      where: s.revenue > 0,
+      select: count(s.id)
+    )
+    |> Repo.one()
+  end
 end
