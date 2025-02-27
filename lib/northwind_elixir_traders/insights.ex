@@ -106,10 +106,14 @@ defmodule NorthwindElixirTraders.Insights do
     )
   end
 
-  def calculate_top_n_customers_by_order_value(n \\ 5) do
-    from(s in subquery(query_top_n_customers_by_order_revenue(n)),
-      select: sum(s.revenue)
-    )
-    |> Repo.one()
+  def calculate_top_n_customers_by_order_value(n \\ 5)
+      when is_integer(n) and n >= 0 do
+    if n == 0,
+      do: 0,
+      else:
+        from(s in subquery(query_top_n_customers_by_order_revenue(n)),
+          select: sum(s.revenue)
+        )
+        |> Repo.one()
   end
 end
