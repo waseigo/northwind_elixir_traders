@@ -148,6 +148,11 @@ defmodule NorthwindElixirTraders.Insights do
     )
   end
 
+  def query_top_n_entity_by_order_revenue(m, n \\ 5)
+      when m in @m_tables and is_integer(n) and n >= 0 do
+    from(s in subquery(query_entity_by_order_revenue(m)), order_by: [desc: s.revenue], limit: ^n)
+  end
+
   def calculate_top_n_customers_by_order_value(n \\ 5)
       when is_integer(n) and n >= 0 do
     if n == 0,
