@@ -229,4 +229,12 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def extract_task_results(r) when is_list(r), do: Enum.map(r, &elem(&1, 1))
+
+  def calculate_gini_coeff(xyl) when is_list(xyl) do
+    xyl
+    |> then(&Enum.zip(&1, tl(&1)))
+    |> Enum.reduce(0.0, fn c, acc -> acc + calculate_chunk_area(c) end)
+    |> Kernel.-(0.5)
+    |> Kernel.*(2)
+  end
 end
