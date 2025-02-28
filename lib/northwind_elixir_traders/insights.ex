@@ -105,6 +105,14 @@ defmodule NorthwindElixirTraders.Insights do
 
   def query_customers_by_order_revenue, do: query_entity_by_order_revenue(Customer)
 
+  def query_entity_by_order_revenue(m) when m == Product do
+    from(x in m,
+      join: od in assoc(x, :order_details),
+      group_by: x.id,
+      select: %{id: x.id, name: x.name, revenue: sum(od.quantity * x.price)}
+    )
+  end
+
   def query_entity_by_order_revenue(m) when m in [Supplier, Category] do
     from(x in m,
       join: p in assoc(x, :products),
