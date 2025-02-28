@@ -151,4 +151,9 @@ defmodule NorthwindElixirTraders.Insights do
     |> Enum.to_list()
     |> Enum.map(&elem(&1, 1))
   end
+
+  def calculate_chunk_area({{x1, y1}, {x2, y2}}) do
+    {w, h} = {x2 - x1, y2 - y1}
+    w * h * 0.5 + y1 * w
+  end
 end
