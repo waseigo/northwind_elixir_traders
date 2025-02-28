@@ -159,6 +159,17 @@ defmodule NorthwindElixirTraders.Insights do
         |> Repo.one()
   end
 
+  def calculate_top_n_entity_by_order_value(m, n \\ 5)
+      when m in @m_tables and is_integer(n) and n >= 0 do
+    if n == 0,
+      do: 0,
+      else:
+        from(s in subquery(query_top_n_entity_by_order_revenue(m, n)),
+          select: sum(s.revenue)
+        )
+        |> Repo.one()
+  end
+
   def count_customers_with_revenues do
     from(s in subquery(query_customers_by_order_revenue()),
       where: s.revenue > 0,
