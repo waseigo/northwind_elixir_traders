@@ -1,6 +1,6 @@
 defmodule NorthwindElixirTraders.Insights do
   import Ecto.Query
-  alias NorthwindElixirTraders.{Repo, Product, Order, OrderDetail, Customer}
+  alias NorthwindElixirTraders.{Repo, Product, Order, OrderDetail, Customer, Employee, Shipper}
   @timeout 10_000
   @max_concurrency System.schedulers_online()
 
@@ -137,6 +137,21 @@ defmodule NorthwindElixirTraders.Insights do
     case condition do
       :with -> count_with
       :without -> Repo.aggregate(Customer, :count) - count_with
+    end
+  end
+
+  def count_entity_orders(m, condition \\ :with)
+      when m in [Customer, Employee, Shipper] and condition in [:with, :without] do
+    count_with =
+      from(x in m)
+      |> join(:inner, [x], o in assoc(x, :orders))
+      |> select([x], x.id)
+      |> distinct(true)
+      |> Repo.aggregate(:count)
+
+    case condition do
+      :with -> count_with
+      :without -> Repo.aggregate(m, :count) - count_with
     end
   end
 
