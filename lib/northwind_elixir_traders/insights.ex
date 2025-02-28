@@ -163,4 +163,6 @@ defmodule NorthwindElixirTraders.Insights do
 
     xyl |> Enum.map(fn {n, r} -> {n / mxn, r / mxr} end)
   end
+
+  def extract_task_results(r) when is_list(r), do: Enum.map(r, &elem(&1, 1))
 end
