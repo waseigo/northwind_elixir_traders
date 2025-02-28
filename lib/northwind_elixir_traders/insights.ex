@@ -139,4 +139,16 @@ defmodule NorthwindElixirTraders.Insights do
       :without -> Repo.aggregate(Customer, :count) - count_with
     end
   end
+
+  def generate_customer_share_of_revenues_xy do
+    nc = count_customers_orders(:with)
+    total = Order |> Repo.all() |> calculate_total_value_of_orders()
+
+    Task.async_stream(
+      0..nc,
+      &{&1 / nc, calculate_top_n_customers_by_order_value(&1) / total}
+    )
+    |> Enum.to_list()
+    |> Enum.map(&elem(&1, 1))
+  end
 end
