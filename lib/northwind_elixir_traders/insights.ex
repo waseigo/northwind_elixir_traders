@@ -237,4 +237,8 @@ defmodule NorthwindElixirTraders.Insights do
     |> Kernel.-(0.5)
     |> Kernel.*(2)
   end
+
+  def gini(m) when m in @m_tables do
+    m |> generate_entity_share_of_revenues_xy() |> calculate_gini_coeff()
+  end
 end
