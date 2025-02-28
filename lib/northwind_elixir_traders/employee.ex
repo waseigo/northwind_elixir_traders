@@ -9,6 +9,7 @@ defmodule NorthwindElixirTraders.Employee do
   schema "employees" do
     field(:last_name, :string)
     field(:first_name, :string)
+    field(:name, :string, virtual: true)
     field(:birth_date, :date)
     field(:photo, :string)
     field(:notes, :string)
@@ -30,5 +31,9 @@ defmodule NorthwindElixirTraders.Employee do
     |> Validations.validate_age_range(:birth_date, min: 15, max: 100)
     |> unique_constraint([:last_name, :first_name, :birth_date])
     |> unique_constraint([:id])
+  end
+
+  def populate_name(%__MODULE__{first_name: first, last_name: last} = e) do
+    %{e | name: last <> " " <> first}
   end
 end
