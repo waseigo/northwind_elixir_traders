@@ -13,7 +13,8 @@ defmodule NorthwindElixirTraders.Supplier do
     field(:postal_code, :string)
     field(:country, :string)
     field(:phone, :string)
-    has_many(:products, Product)
+    has_many(:products, Product, on_replace: :nilify)
+    has_many(:orders, through: [:products, :order_details, :order])
 
     timestamps(type: :utc_datetime)
   end
