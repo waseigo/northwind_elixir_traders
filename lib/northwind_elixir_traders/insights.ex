@@ -241,4 +241,16 @@ defmodule NorthwindElixirTraders.Insights do
   def gini(m) when m in @m_tables do
     m |> generate_entity_share_of_revenues_xy() |> calculate_gini_coeff()
   end
+
+  def calculate_relative_revenue_share_of_entity_rows(m) do
+    data =
+      from(s in subquery(query_entity_by_order_revenue(m)), order_by: [desc: s.revenue])
+      |> Repo.all()
+
+    total = Enum.sum_by(data, & &1.revenue)
+
+    Enum.map(data, fn %{revenue: r} = x ->
+      %{id: x.id, name: x.name, share: Float.round(r / total, 3)}
+    end)
+  end
 end
