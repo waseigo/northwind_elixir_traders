@@ -125,20 +125,7 @@ defmodule NorthwindElixirTraders.Insights do
     |> Repo.one()
   end
 
-  def count_customers_orders(condition \\ :with)
-      when condition in [:with, :without] do
-    count_with =
-      from(c in Customer)
-      |> join(:inner, [c], o in assoc(c, :orders))
-      |> select([c], c.id)
-      |> distinct(true)
-      |> Repo.aggregate(:count)
-
-    case condition do
-      :with -> count_with
-      :without -> Repo.aggregate(Customer, :count) - count_with
-    end
-  end
+  def count_customers_orders(condition \\ :with), do: count_entity_orders(Customer, condition)
 
   def count_entity_orders(m, condition \\ :with)
       when m in [Customer, Employee, Shipper] and condition in [:with, :without] do
