@@ -10,6 +10,7 @@ defmodule NorthwindElixirTraders.Category do
     field(:name, :string)
     field(:description, :string)
     has_many(:products, Product, on_replace: :nilify)
+    has_many(:orders, through: [:products, :order_details, :order])
 
     timestamps(type: :utc_datetime)
   end
