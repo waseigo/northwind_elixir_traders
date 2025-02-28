@@ -192,6 +192,14 @@ defmodule NorthwindElixirTraders.Insights do
     |> normalize_xy()
   end
 
+  def generate_entity_share_of_revenues_xy(m) when m in @m_tables do
+    0..count_entity_orders(m, :with)
+    |> Task.async_stream(&{&1, calculate_top_n_entity_by_order_value(m, &1)})
+    |> Enum.to_list()
+    |> extract_task_results()
+    |> normalize_xy()
+  end
+
   def calculate_chunk_area({{x1, y1}, {x2, y2}}) do
     {w, h} = {x2 - x1, y2 - y1}
     w * h * 0.5 + y1 * w
