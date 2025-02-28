@@ -141,15 +141,11 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def generate_customer_share_of_revenues_xy do
-    nc = count_customers_orders(:with)
-    total = Order |> Repo.all() |> calculate_total_value_of_orders()
-
-    Task.async_stream(
-      0..nc,
-      &{&1 / nc, calculate_top_n_customers_by_order_value(&1) / total}
-    )
+    0..count_customers_orders(:with)
+    |> Task.async_stream(&{&1, calculate_top_n_customers_by_order_value(&1)})
     |> Enum.to_list()
-    |> Enum.map(&elem(&1, 1))
+    |> extract_task_results()
+    |> normalize_xy()
   end
 
   def calculate_chunk_area({{x1, y1}, {x2, y2}}) do
