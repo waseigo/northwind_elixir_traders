@@ -123,13 +123,22 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def query_entity_by_order_revenue(m) when m in @m_tables do
-    from(x in m,
-      join: o in assoc(x, :orders),
-      join: od in assoc(o, :order_details),
-      join: p in assoc(od, :product),
-      group_by: x.id,
-      select: %{id: x.id, name: x.name, revenue: sum(od.quantity * p.price)}
-    )
+    query =
+      from(x in m,
+        join: o in assoc(x, :orders),
+        join: od in assoc(o, :order_details),
+        join: p in assoc(od, :product),
+        group_by: x.id,
+        select: %{id: x.id, revenue: sum(od.quantity * p.price)}
+      )
+
+    if m == Employee do
+      select_merge(query, [x, o, od, p], %{
+        name: fragment("? || ' ' || ?", x.last_name, x.first_name)
+      })
+    else
+      select_merge(query, [x, o, od, p], %{name: x.name})
+    end
   end
 
   def query_top_n_customers_by_order_revenue(n \\ 5) do
