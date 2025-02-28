@@ -156,4 +156,11 @@ defmodule NorthwindElixirTraders.Insights do
     {w, h} = {x2 - x1, y2 - y1}
     w * h * 0.5 + y1 * w
   end
+
+  def normalize_xy(xyl) when is_list(xyl) do
+    {mxn, mxr} =
+      xyl |> Enum.reduce({0, 0}, fn {n, r}, {mxn, mxr} -> {max(n, mxn), max(r, mxr)} end)
+
+    xyl |> Enum.map(fn {n, r} -> {n / mxn, r / mxr} end)
+  end
 end
