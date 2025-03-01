@@ -40,11 +40,11 @@ defmodule NorthwindElixirTraders.Joins do
     |> join(:inner, [od: od], p in assoc(od, :product), as: :p)
   end
 
-  def to_p_od_and_group(m), do: entity_to_p_od(m) |> group_by([x], x.id)
+  def to_p_od_and_group(m), do: entity_to_p_od(m) |> group_by([x: x], x.id)
 
   def p_od_group_and_select(m) when m == Product do
     to_p_od_and_group(m)
-    |> select([x, od], %{
+    |> select([x: x, od: od], %{
       id: x.id,
       name: x.name,
       quantity: sum(od.quantity),
@@ -54,7 +54,7 @@ defmodule NorthwindElixirTraders.Joins do
 
   def p_od_group_and_select(m) when m in @lhs do
     to_p_od_and_group(m)
-    |> select([x, p, od], %{
+    |> select([x: x, p: p, od: od], %{
       id: x.id,
       name: x.name,
       quantity: sum(od.quantity),
@@ -64,7 +64,7 @@ defmodule NorthwindElixirTraders.Joins do
 
   def p_od_group_and_select(m) when m in @rhs do
     to_p_od_and_group(m)
-    |> select([x, o, od, p], %{
+    |> select([x: x, od: od, p: p], %{
       id: x.id,
       quantity: sum(od.quantity),
       revenue: sum(p.price * od.quantity)
