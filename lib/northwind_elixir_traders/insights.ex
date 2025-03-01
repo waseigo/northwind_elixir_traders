@@ -256,4 +256,17 @@ defmodule NorthwindElixirTraders.Insights do
 
     where(query, ^w)
   end
+
+  def filter_by_date(query = %Ecto.Query{}, end: e = %Date{}, field: field)
+      when field in [:date, :birth_date] do
+    e = if field == :date, do: to_utc_datetime!(e, :end), else: e
+
+    w =
+      case field do
+        :date -> dynamic([o: o], field(o, ^field) <= ^e)
+        :birth_date -> dynamic([x: x], field(x, ^field) <= ^e)
+      end
+
+    where(query, ^w)
+  end
 end
