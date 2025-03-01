@@ -122,25 +122,17 @@ defmodule NorthwindElixirTraders.Insights do
     )
   end
 
-  def calculate_top_n_customers_by_order_value(n \\ 5)
-      when is_integer(n) and n >= 0 do
-    if n == 0,
-      do: 0,
-      else:
-        from(s in subquery(query_top_n_customers_by_order_revenue(n)),
-          select: sum(s.revenue)
-        )
-        |> Repo.one()
-  end
+  def calculate_top_n_customers_by_order_value(n \\ 5),
+    do: calculate_top_n_entity_by_order_value(Customer, n)
 
-  def calculate_top_n_entity_by_order_value(m, n \\ 5)
-      when m in @m_tables and is_integer(n) and n >= 0 do
+  def calculate_top_n_entity_by_order_value(m, n \\ 5),
+    do: calculate_top_n_entity_by(m, :revenue, n)
+
+  def calculate_top_n_entity_by(m, field, n \\ 5) do
     if n == 0,
       do: 0,
       else:
-        from(s in subquery(query_top_n_entity_by_order_revenue(m, n)),
-          select: sum(s.revenue)
-        )
+        from(s in subquery(query_top_n_entity_by(m, field, n)), select: sum(field(s, ^field)))
         |> Repo.one()
   end
 
