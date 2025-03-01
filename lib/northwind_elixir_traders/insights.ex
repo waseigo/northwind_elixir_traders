@@ -277,4 +277,13 @@ defmodule NorthwindElixirTraders.Insights do
       select: %{id: x.id, name: x.name, quantity: sum(od.quantity)}
     )
   end
+
+  def query_entity_by_product_quantity(m) when m in [Supplier, Category] do
+    from(x in m,
+      join: p in assoc(x, :products),
+      join: od in assoc(p, :order_details),
+      group_by: x.id,
+      select: %{id: x.id, name: x.name, quantity: sum(od.quantity)}
+    )
+  end
 end
