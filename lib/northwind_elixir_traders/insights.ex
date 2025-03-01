@@ -269,4 +269,9 @@ defmodule NorthwindElixirTraders.Insights do
 
     where(query, ^w)
   end
+
+  def filter_by_date(query = %Ecto.Query{}, start: s = %Date{}, end: e = %Date{}, field: field)
+      when field in [:date, :birth_date] do
+    query |> filter_by_date(start: s, field: field) |> filter_by_date(end: e, field: field)
+  end
 end
