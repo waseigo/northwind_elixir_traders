@@ -106,6 +106,8 @@ defmodule NorthwindElixirTraders.Insights do
 
   def query_customers_by_order_revenue, do: query_entity_by_order_revenue(Customer)
 
+  def query_entity_record_totals(m), do: Joins.p_od_group_and_select(m)
+
   def query_entity_by_order_revenue(m), do: Joins.p_od_group_and_select(m)
 
   def query_top_n_customers_by_order_revenue(n \\ 5) do
