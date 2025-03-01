@@ -238,7 +238,22 @@ defmodule NorthwindElixirTraders.Insights do
   def to_utc_datetime!(iso_date = %Date{}, :end),
     do: DateTime.new!(iso_date, ~T[23:59:59], "Etc/UTC")
 
-  def filter_by_date(query = %Ecto.Query{}, opts, field \\ :date)
-      when opts === [] and field in [:date, :birth_date],
+  def filter_by_date(query, opts \\ [field: :date])
+
+  def filter_by_date(query = %Ecto.Query{}, opts)
+      when opts in [[field: :date], [field: :birth_date]],
       do: query
+
+  def filter_by_date(query = %Ecto.Query{}, start: s = %Date{}, field: field)
+      when field in [:date, :birth_date] do
+    s = if field == :date, do: to_utc_datetime!(s, :start), else: s
+
+    w =
+      case field do
+        :date -> dynamic([o: o], field(o, ^field) >= ^s)
+        :birth_date -> dynamic([x: x], field(x, ^field) >= ^s)
+      end
+
+    where(query, ^w)
+  end
 end
