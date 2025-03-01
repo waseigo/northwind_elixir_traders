@@ -250,7 +250,23 @@ defmodule NorthwindElixirTraders.Insights do
     total = Enum.sum_by(data, & &1.revenue)
 
     Enum.map(data, fn %{revenue: r} = x ->
-      %{id: x.id, name: x.name, share: Float.round(r / total, 3)}
+      %{id: x.id, name: x.name, share: r / total}
     end)
+  end
+
+  def revenue_share_total_trivial_many(m, q \\ 0.8) do
+    calculate_relative_revenue_share_of_entity_rows(m)
+    |> Enum.reverse()
+    |> helper_vital_trivial(m, q)
+  end
+
+  def revenue_share_total_vital_few(m, q \\ 0.2) do
+    calculate_relative_revenue_share_of_entity_rows(m) |> helper_vital_trivial(m, q)
+  end
+
+  def helper_vital_trivial(data, m, q)
+      when is_list(data) and m in @m_tables and is_number(q) and q > 0 and q <= 1 do
+    n = m |> count_entity_orders() |> Kernel.*(q) |> round()
+    data |> Enum.take(n) |> Enum.sum_by(& &1.share)
   end
 end
