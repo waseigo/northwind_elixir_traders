@@ -299,17 +299,38 @@ defmodule NorthwindElixirTraders.Insights do
   def timespan_earliest_latest({y_mn, m_mn} = _ym_mn, {y_mx, m_mx} = _ym_mx)
       when is_integer(y_mn) and is_integer(y_mx) and y_mx >= y_mn and
              m_mn in 1..12 and m_mx in 1..12 do
-    [earliest, latest] = from(o in Order, select: [min(o.date), max(o.date)])
-      |> Repo.one() |> Enum.map(&DateTime.to_date/1)
+    [earliest, latest] =
+      from(o in Order, select: [min(o.date), max(o.date)])
+      |> Repo.one()
+      |> Enum.map(&DateTime.to_date/1)
 
-    mn = if Date.before?(earliest, %Date{year: y_mn, month: m_mn, day: 1}),
+    mn =
+      if Date.before?(earliest, %Date{year: y_mn, month: m_mn, day: 1}),
         do: {y_mn, m_mn},
         else: {earliest.year, earliest.month}
 
-    mx = if Date.after?(%Date{year: y_mx, month: m_mx, day: 1}, latest),
+    mx =
+      if Date.after?(%Date{year: y_mx, month: m_mx, day: 1}, latest),
         do: {latest.year, latest.month},
         else: {y_mx, m_mx}
 
     {mn, mx}
+  end
+
+  def timespan_ym_to_opts_list({y_mn, m_mn} = _ym_mn, {y_mx, m_mx} = _ym_mx)
+      when is_integer(y_mn) and is_integer(y_mx) and y_mx >= y_mn and
+             m_mn in 1..12 and m_mx in 1..12 do
+    {{y_early, m_early}, {y_late, m_late}} = timespan_earliest_latest({y_mn, m_mn}, {y_mx, m_mx})
+    n_months = timespan_number_of_months({y_mn, m_mn}, {y_mx, m_mx})
+
+    Enum.reduce_while(1..n_months, [ym_to_dates(y_early, m_early)], fn _, acc ->
+      prev = hd(acc)
+      next = Date.add(prev[:end], 1)
+
+      if {next.year, next.month} <= {y_late, m_late},
+        do: {:cont, [ym_to_dates(next.year, next.month) | acc]},
+        else: {:halt, acc}
+    end)
+    |> Enum.reverse()
   end
 end
