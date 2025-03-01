@@ -9,7 +9,8 @@ defmodule NorthwindElixirTraders.Joins do
     Order,
     Employee,
     Shipper,
-    Customer
+    Customer,
+    Insights
   }
 
   @tables [Supplier, Category, Product, OrderDetail, Order, Employee, Shipper, Customer]
@@ -41,6 +42,9 @@ defmodule NorthwindElixirTraders.Joins do
   end
 
   def to_p_od_and_group(m), do: entity_to_p_od(m) |> group_by([x: x], x.id)
+
+  def p_od_group_and_select(m, opts) when is_list(opts),
+    do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
   def p_od_group_and_select(m) when m == Product do
     to_p_od_and_group(m)
