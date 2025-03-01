@@ -269,4 +269,12 @@ defmodule NorthwindElixirTraders.Insights do
     n = m |> count_entity_orders() |> Kernel.*(q) |> round()
     data |> Enum.take(n) |> Enum.sum_by(& &1.share)
   end
+
+  def query_entity_by_product_quantity(m) when m == Product do
+    from(x in m,
+      join: od in assoc(x, :order_details),
+      group_by: x.id,
+      select: %{id: x.id, name: x.name, quantity: sum(od.quantity)}
+    )
+  end
 end
