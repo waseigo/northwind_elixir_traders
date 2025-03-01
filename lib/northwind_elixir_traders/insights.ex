@@ -105,21 +105,21 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def query_customers_by_order_revenue, do: query_entity_by_order_revenue(Customer)
-
+  def query_entity_by_order_revenue(m), do: Joins.p_od_group_and_select(m)
+  def query_entity_by_product_quantity(m), do: Joins.p_od_group_and_select(m)
   def query_entity_record_totals(m), do: Joins.p_od_group_and_select(m)
 
-  def query_entity_by_order_revenue(m), do: Joins.p_od_group_and_select(m)
+  def query_top_n_customers_by_order_revenue(n \\ 5),
+    do: query_top_n_entity_by_order_revenue(Customer, n)
 
-  def query_top_n_customers_by_order_revenue(n \\ 5) do
-    from(s in subquery(query_customers_by_order_revenue()),
-      order_by: [desc: s.revenue],
+  def query_top_n_entity_by_order_revenue(m, n \\ 5), do: query_top_n_entity_by(m, :revenue, n)
+
+  def query_top_n_entity_by(m, field, n \\ 5)
+      when is_integer(n) and n >= 0 and field in [:quantity, :revenue] do
+    from(s in subquery(query_entity_record_totals(m)),
+      order_by: [desc: field(s, ^field)],
       limit: ^n
     )
-  end
-
-  def query_top_n_entity_by_order_revenue(m, n \\ 5)
-      when m in @m_tables and is_integer(n) and n >= 0 do
-    from(s in subquery(query_entity_by_order_revenue(m)), order_by: [desc: s.revenue], limit: ^n)
   end
 
   def calculate_top_n_customers_by_order_value(n \\ 5)
@@ -238,6 +238,4 @@ defmodule NorthwindElixirTraders.Insights do
     n = m |> count_entity_orders() |> Kernel.*(q) |> round()
     data |> Enum.take(n) |> Enum.sum_by(& &1.share)
   end
-
-  def query_entity_by_product_quantity(m), do: Joins.p_od_group_and_select(m)
 end
