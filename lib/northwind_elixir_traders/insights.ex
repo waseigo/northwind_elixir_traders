@@ -161,17 +161,12 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
-  def generate_customer_share_of_revenues_xy do
-    0..count_customers_orders(:with)
-    |> Task.async_stream(&{&1, calculate_top_n_customers_by_order_value(&1)})
-    |> Enum.to_list()
-    |> extract_task_results()
-    |> normalize_xy()
-  end
+  def generate_customer_share_of_revenues_xy, do: generate_entity_share_of_revenues_xy(Customer)
+  def generate_entity_share_of_revenues_xy(m), do: generate_entity_share_of_xy(m, :revenue)
 
-  def generate_entity_share_of_revenues_xy(m) when m in @m_tables do
+  def generate_entity_share_of_xy(m, field) do
     0..count_entity_orders(m, :with)
-    |> Task.async_stream(&{&1, calculate_top_n_entity_by_order_value(m, &1)})
+    |> Task.async_stream(&{&1, calculate_top_n_entity_by(m, field, &1)})
     |> Enum.to_list()
     |> extract_task_results()
     |> normalize_xy()
@@ -199,9 +194,7 @@ defmodule NorthwindElixirTraders.Insights do
     |> Kernel.*(2)
   end
 
-  def gini(m) when m in @m_tables do
-    m |> generate_entity_share_of_revenues_xy() |> calculate_gini_coeff()
-  end
+  def gini(m, field), do: generate_entity_share_of_xy(m, field) |> calculate_gini_coeff()
 
   def calculate_relative_revenue_share_of_entity_rows(m) do
     data =
