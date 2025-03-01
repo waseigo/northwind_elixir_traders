@@ -278,4 +278,9 @@ defmodule NorthwindElixirTraders.Insights do
   def ym_to_dates(year) when is_integer(year) do
     [start: %Date{year: year, month: 1, day: 1}, end: %Date{year: year, month: 12, day: 31}]
   end
+
+  def ym_to_dates(year, month) when is_integer(year) and month in 1..12 do
+    s = %Date{year: year, month: month, day: 1}
+    [start: s, end: Date.end_of_month(s)]
+  end
 end
