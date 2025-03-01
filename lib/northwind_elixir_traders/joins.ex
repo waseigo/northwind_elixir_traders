@@ -74,10 +74,10 @@ defmodule NorthwindElixirTraders.Joins do
 
   def rhs_merge_name(%Ecto.Query{} = query, m) when m == Employee,
     do:
-      select_merge(query, [x, o, od, p], %{
+      select_merge(query, [x: x], %{
         name: fragment("? || ' ' || ?", x.last_name, x.first_name)
       })
 
   def rhs_merge_name(%Ecto.Query{} = query, m) when m in @rhs,
-    do: select_merge(query, [x, o, od, p], %{name: x.name})
+    do: select_merge(query, [x: x], %{name: x.name})
 end
