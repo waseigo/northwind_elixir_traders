@@ -68,5 +68,15 @@ defmodule NorthwindElixirTraders.Joins do
       quantity: sum(od.quantity),
       revenue: sum(p.price * od.quantity)
     })
+    |> rhs_merge_name(m)
   end
+
+  def rhs_merge_name(%Ecto.Query{} = query, m) when m == Employee,
+    do:
+      select_merge(query, [x, o, od, p], %{
+        name: fragment("? || ' ' || ?", x.last_name, x.first_name)
+      })
+
+  def rhs_merge_name(%Ecto.Query{} = query, m) when m in @rhs,
+    do: select_merge(query, [x, o, od, p], %{name: x.name})
 end
