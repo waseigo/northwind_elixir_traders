@@ -213,15 +213,18 @@ defmodule NorthwindElixirTraders.Insights do
     end)
   end
 
-  def revenue_share_total_trivial_many(m, q \\ 0.8) do
-    calculate_relative_revenue_share_of_entity_rows(m)
+  def revenue_share_total_trivial_many(m, q \\ 0.8), do: share_total_trivial_many(m, :revenue, q)
+
+  def share_total_trivial_many(m, field, q \\ 0.8) do
+    calculate_relative_share_of_entity_rows(m, field)
     |> Enum.reverse()
     |> helper_vital_trivial(m, q)
   end
 
-  def revenue_share_total_vital_few(m, q \\ 0.2) do
-    calculate_relative_revenue_share_of_entity_rows(m) |> helper_vital_trivial(m, q)
-  end
+  def revenue_share_total_vital_few(m, q \\ 0.2), do: share_total_vital_few(m, :revenue, q)
+
+  def share_total_vital_few(m, field, q \\ 0.2),
+    do: calculate_relative_share_of_entity_rows(m, field) |> helper_vital_trivial(m, q)
 
   def helper_vital_trivial(data, m, q)
       when is_list(data) and m in @m_tables and is_number(q) and q > 0 and q <= 1 do
