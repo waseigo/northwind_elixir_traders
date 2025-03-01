@@ -274,4 +274,8 @@ defmodule NorthwindElixirTraders.Insights do
       when field in [:date, :birth_date] do
     query |> filter_by_date(start: s, field: field) |> filter_by_date(end: e, field: field)
   end
+
+  def ym_to_dates(year) when is_integer(year) do
+    [start: %Date{year: year, month: 1, day: 1}, end: %Date{year: year, month: 12, day: 31}]
+  end
 end
