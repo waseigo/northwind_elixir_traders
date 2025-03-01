@@ -41,7 +41,12 @@ defmodule NorthwindElixirTraders.Joins do
     |> join(:inner, [od: od], p in assoc(od, :product), as: :p)
   end
 
-  def to_p_od_and_group(m), do: entity_to_p_od(m) |> group_by([x: x], x.id)
+  def to_p_od_and_group(m), do: to_p_od_and_group(m, :id)
+
+  def to_p_od_and_group(m, field) when is_atom(field) do
+    d_field = dynamic([x: x], field(x, ^field))
+    entity_to_p_od(m) |> group_by(^d_field)
+  end
 
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
