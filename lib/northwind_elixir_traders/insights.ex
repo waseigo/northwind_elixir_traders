@@ -196,15 +196,20 @@ defmodule NorthwindElixirTraders.Insights do
 
   def gini(m, field), do: generate_entity_share_of_xy(m, field) |> calculate_gini_coeff()
 
-  def calculate_relative_revenue_share_of_entity_rows(m) do
+  def calculate_relative_revenue_share_of_entity_rows(m),
+    do: calculate_relative_share_of_entity_rows(m, :revenue)
+
+  def calculate_relative_share_of_entity_rows(m, field) do
     data =
-      from(s in subquery(query_entity_by_order_revenue(m)), order_by: [desc: s.revenue])
+      from(s in subquery(query_entity_record_totals(m)),
+        order_by: [desc: field(s, ^field)]
+      )
       |> Repo.all()
 
-    total = Enum.sum_by(data, & &1.revenue)
+    total = Enum.sum_by(data, &Map.get(&1, field))
 
-    Enum.map(data, fn %{revenue: r} = x ->
-      %{id: x.id, name: x.name, share: r / total}
+    Enum.map(data, fn x ->
+      %{id: x.id, name: x.name, share: x[field] / total}
     end)
   end
 
