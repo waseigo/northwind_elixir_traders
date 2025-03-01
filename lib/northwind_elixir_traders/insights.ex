@@ -286,4 +286,23 @@ defmodule NorthwindElixirTraders.Insights do
       select: %{id: x.id, name: x.name, quantity: sum(od.quantity)}
     )
   end
+
+  def query_entity_by_product_quantity(m) when m in @m_tables do
+    query =
+      from(x in m,
+        join: o in assoc(x, :orders),
+        join: od in assoc(o, :order_details),
+        join: p in assoc(od, :product),
+        group_by: x.id,
+        select: %{id: x.id, quantity: sum(od.quantity)}
+      )
+
+    if m == Employee do
+      select_merge(query, [x, o, od, p], %{
+        name: fragment("? || ' ' || ?", x.last_name, x.first_name)
+      })
+    else
+      select_merge(query, [x, o, od, p], %{name: x.name})
+    end
+  end
 end
