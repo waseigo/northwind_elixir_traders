@@ -231,4 +231,10 @@ defmodule NorthwindElixirTraders.Insights do
     n = m |> count_entity_orders() |> Kernel.*(q) |> round()
     data |> Enum.take(n) |> Enum.sum_by(& &1.share)
   end
+
+  def to_utc_datetime!(iso_date = %Date{}, :start),
+    do: DateTime.new!(iso_date, ~T[00:00:00], "Etc/UTC")
+
+  def to_utc_datetime!(iso_date = %Date{}, :end),
+    do: DateTime.new!(iso_date, ~T[23:59:59], "Etc/UTC")
 end
