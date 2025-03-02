@@ -48,6 +48,20 @@ defmodule NorthwindElixirTraders.Joins do
     entity_to_p_od(m) |> group_by(^d_field)
   end
 
+  def p_od_group_and_select(m, field, opts)
+      when is_list(opts) and m == Customer and field == :country,
+      do: p_od_group_and_select(m, field) |> Insights.filter_by_date(opts)
+
+  def p_od_group_and_select(m, field) when m == Customer and field == :country do
+    to_p_od_and_group(m, field)
+    |> select([x: x, od: od, p: p], %{
+      id: x.id,
+      country: x.country,
+      quantity: sum(od.quantity),
+      revenue: sum(p.price * od.quantity)
+    })
+  end
+
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
