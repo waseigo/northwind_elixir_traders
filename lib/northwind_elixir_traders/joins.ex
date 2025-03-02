@@ -116,4 +116,13 @@ defmodule NorthwindElixirTraders.Joins do
       join: y in assoc(o, ^module_to_assoc_field(ym))
     )
   end
+
+  def xy(xm, ym) when xm in @rhs and ym in @lhs do
+    from(x in xm,
+      join: o in assoc(x, :orders),
+      join: od in assoc(o, :order_details),
+      join: p in assoc(od, :product),
+      join: y in assoc(p, ^module_to_assoc_field(ym))
+    )
+  end
 end
