@@ -381,13 +381,12 @@ defmodule NorthwindElixirTraders.Insights do
              is_atom(partition_by) do
     q = Joins.entity_to_p_od(m) |> distinct(true)
 
+    d_xm = dynamic([x: x], field(x, ^xm))
+    d_pb = dynamic([x: x], field(x, ^partition_by))
+    d_sum = dynamic([x: x, p: p, od: od], sum(od.quantity * p.price) |> over(partition_by: ^d_pb))
+
     case agg do
-      :sum ->
-        select(
-          q,
-          [x: x, p: p, od: od],
-          {field(x, ^xm), over(sum(od.quantity * p.price), partition_by: field(x, ^partition_by))}
-        )
+      :sum -> select(q, [x: x, p: p, od: od], {^d_xm, ^d_sum})
     end
   end
 end
