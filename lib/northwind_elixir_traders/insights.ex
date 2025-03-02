@@ -333,4 +333,21 @@ defmodule NorthwindElixirTraders.Insights do
     end)
     |> Enum.reverse()
   end
+
+  def by_employee_by_product(eid, pid, opts) when is_list(opts),
+    do: by_employee_by_product(eid, pid) |> filter_by_date(opts)
+
+  def by_employee_by_product(eid, pid) do
+    from(p in Product, as: :p)
+    |> join(:inner, [p: p], od in assoc(p, :order_details), as: :od)
+    |> join(:inner, [od: od], o in assoc(od, :order), as: :o)
+    |> join(:inner, [o: o], e in assoc(o, :employee), as: :e)
+    |> where([p: p, e: e], p.id == ^pid and e.id == ^eid)
+    |> select([p: p, e: e, od: od], %{
+      product: p.name,
+      employee: e.last_name,
+      quantity: sum(od.quantity),
+      revenue: sum(p.price * od.quantity)
+    })
+  end
 end
