@@ -383,10 +383,10 @@ defmodule NorthwindElixirTraders.Insights do
 
     d_xm = dynamic([x: x], field(x, ^xm))
     d_pb = dynamic([x: x], field(x, ^partition_by))
-    d_sum = dynamic([x: x, p: p, od: od], sum(od.quantity * p.price) |> over(partition_by: ^d_pb))
+    d_sum = dynamic([x: x, p: p, od: od], sum(od.quantity * p.price) |> over(:part))
 
     case agg do
-      :sum -> select(q, [x: x, p: p, od: od], {^d_xm, ^d_sum})
+      :sum -> from(q, select: {^d_xm, ^d_sum}, windows: [part: [partition_by: ^d_pb]])
     end
   end
 end
