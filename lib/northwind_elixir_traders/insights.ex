@@ -351,6 +351,16 @@ defmodule NorthwindElixirTraders.Insights do
     })
   end
 
+  def by_employee_by_product_all do
+    for eid <- Repo.all(from(e in Employee, select: e.id)) do
+      for pid <- Repo.all(from(p in Product, select: p.id)) do
+        Repo.one(by_employee_by_product(eid, pid))
+      end
+    end
+    |> List.flatten()
+    |> Enum.reject(&is_nil(Map.values(&1) |> Enum.uniq() |> hd))
+  end
+
   def benchmark(query = %Ecto.Query{}, kind \\ :all, reps \\ 1_000)
       when kind in [:all, :one] and is_integer(reps) do
     rf =
