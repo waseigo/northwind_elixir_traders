@@ -103,4 +103,17 @@ defmodule NorthwindElixirTraders.Joins do
 
   def rhs_merge_name(%Ecto.Query{} = query, m) when m in @rhs,
     do: select_merge(query, [x: x], %{name: x.name})
+
+  def module_to_assoc_field(m) when m in @tables do
+    Module.split(m) |> List.last() |> String.downcase() |> String.to_atom()
+  end
+
+  def xy(xm, ym) when xm in @lhs and ym in @rhs do
+    from(x in xm,
+      join: p in assoc(x, :products),
+      join: od in assoc(p, :order_details),
+      join: o in assoc(od, :order),
+      join: y in assoc(o, ^module_to_assoc_field(ym))
+    )
+  end
 end
