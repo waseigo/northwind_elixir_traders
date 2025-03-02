@@ -380,7 +380,14 @@ defmodule NorthwindElixirTraders.Insights do
              is_atom(xm) and agg in [:sum, :min, :max, :avg, :count] and is_atom(metric) and
              is_atom(partition_by) do
     q = Joins.entity_to_p_od(m) |> distinct(true)
-    # … # dynamic query building goes here
-    q
+
+    case agg do
+      :sum ->
+        select(
+          q,
+          [x: x, p: p, od: od],
+          {field(x, ^xm), over(sum(od.quantity * p.price), partition_by: field(x, ^partition_by))}
+        )
+    end
   end
 end
