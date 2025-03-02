@@ -350,4 +350,18 @@ defmodule NorthwindElixirTraders.Insights do
       revenue: sum(p.price * od.quantity)
     })
   end
+
+  def benchmark(query = %Ecto.Query{}, kind \\ :all, reps \\ 1_000)
+      when kind in [:all, :one] and is_integer(reps) do
+    rf =
+      case kind do
+        :all -> fn x -> Repo.all(x) end
+        :one -> fn x -> Repo.one(x) end
+      end
+
+    1..reps
+    |> Enum.map(fn _ -> :timer.tc(fn -> rf.(query) end) end)
+    |> Enum.sum_by(&elem(&1, 0))
+    |> Kernel./(reps)
+  end
 end
