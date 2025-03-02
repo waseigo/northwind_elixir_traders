@@ -374,4 +374,13 @@ defmodule NorthwindElixirTraders.Insights do
     |> Enum.sum_by(&elem(&1, 0))
     |> Kernel./(reps)
   end
+
+  def query_entity_window_dynamic(m, xm, agg \\ :sum, metric \\ :revenue, partition_by \\ :id)
+      when m in @m_tables and
+             is_atom(xm) and agg in [:sum, :min, :max, :avg, :count] and is_atom(metric) and
+             is_atom(partition_by) do
+    q = Joins.entity_to_p_od(m) |> distinct(true)
+    # … # dynamic query building goes here
+    q
+  end
 end
