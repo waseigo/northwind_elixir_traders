@@ -109,20 +109,18 @@ defmodule NorthwindElixirTraders.Joins do
   end
 
   def xy(xm, ym) when xm in @lhs and ym in @rhs do
-    from(x in xm,
-      join: p in assoc(x, :products),
-      join: od in assoc(p, :order_details),
-      join: o in assoc(od, :order),
-      join: y in assoc(o, ^module_to_assoc_field(ym))
-    )
+    from(x in xm, as: :x)
+    |> join(:inner, [x: x], p in assoc(x, :products), as: :p)
+    |> join(:inner, [p: p], od in assoc(p, :order_details), as: :od)
+    |> join(:inner, [od: od], o in assoc(od, :order), as: :o)
+    |> join(:inner, [o: o], y in assoc(o, ^module_to_assoc_field(ym)), as: :y)
   end
 
   def xy(xm, ym) when xm in @rhs and ym in @lhs do
-    from(x in xm,
-      join: o in assoc(x, :orders),
-      join: od in assoc(o, :order_details),
-      join: p in assoc(od, :product),
-      join: y in assoc(p, ^module_to_assoc_field(ym))
-    )
+    from(x in xm, as: :x)
+    |> join(:inner, [x: x], o in assoc(x, :orders), as: :o)
+    |> join(:inner, [o: o], od in assoc(o, :order_details), as: :od)
+    |> join(:inner, [od: od], p in assoc(od, :product), as: :p)
+    |> join(:inner, [p: p], y in assoc(p, ^module_to_assoc_field(ym)), as: :y)
   end
 end
