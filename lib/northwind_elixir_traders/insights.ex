@@ -386,7 +386,7 @@ defmodule NorthwindElixirTraders.Insights do
     d_sum = dynamic([x: x, p: p, od: od], sum(od.quantity * p.price) |> over(:part))
 
     case agg do
-      :sum -> from(q, select: {^d_xm, ^d_sum}, windows: [part: [partition_by: ^d_pb]])
+      :sum -> from(q, select: ^{d_xm, d_sum}, windows: [part: [partition_by: ^d_pb]])
     end
   end
 end
