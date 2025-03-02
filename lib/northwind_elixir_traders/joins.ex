@@ -123,4 +123,10 @@ defmodule NorthwindElixirTraders.Joins do
     |> join(:inner, [od: od], p in assoc(od, :product), as: :p)
     |> join(:inner, [p: p], y in assoc(p, ^module_to_assoc_field(ym)), as: :y)
   end
+
+  def join_od_to_product(query = %Ecto.Query{}),
+    do: join(query, :inner, [od: od], p in assoc(od, :product), as: :p)
+
+  def join_od_to_order(query = %Ecto.Query{}),
+    do: join(query, :inner, [od: od], o in assoc(od, :order), as: :o)
 end
