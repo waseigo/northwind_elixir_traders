@@ -135,4 +135,16 @@ defmodule NorthwindElixirTraders.Joins do
 
   def join_rhs_to_order(query = %Ecto.Query{}, ym) when ym in @rhs,
     do: join(query, :inner, [o: o], y in assoc(o, ^module_to_assoc_field(ym)), as: :y)
+
+  def join_lhs_to_od(xm) when xm in @lhs do
+    from(x in xm, as: :x)
+    |> join(:inner, [x: x], p in assoc(x, :products), as: :p)
+    |> join(:inner, [p: p], od in assoc(p, :order_details), as: :od)
+  end
+
+  def join_rhs_to_od(xm) when xm in @rhs do
+    from(x in xm, as: :x)
+    |> join(:inner, [x: x], o in assoc(x, :orders), as: :o)
+    |> join(:inner, [o: o], od in assoc(o, :order_details), as: :od)
+  end
 end
