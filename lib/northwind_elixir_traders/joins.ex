@@ -185,4 +185,9 @@ defmodule NorthwindElixirTraders.Joins do
 
   def calc_total_revenues({xm, ym}),
     do: xy(xm, ym) |> select([p: p, od: od], sum(p.price * od.quantity)) |> Repo.one()
+
+  def verify_total_revenues_of_xy(combs) do
+    correct = 38_642_423
+    combs |> Enum.map(&calc_total_revenues/1) |> Enum.reject(&(&1 != {correct, correct}))
+  end
 end
