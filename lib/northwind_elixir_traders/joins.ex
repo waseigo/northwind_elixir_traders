@@ -169,4 +169,16 @@ defmodule NorthwindElixirTraders.Joins do
     |> join(:inner, [x: x], o in assoc(x, :orders), as: :o)
     |> join(:inner, [o: o], od in assoc(o, :order_details), as: :od)
   end
+
+  def gen_combinations() do
+    for lhs <- @tables do
+      for rhs <- @tables do
+        if lhs != OrderDetail and rhs != OrderDetail and rhs != lhs do
+          [{lhs, rhs}, {rhs, lhs}]
+        end
+      end
+    end
+    |> List.flatten()
+    |> Enum.reject(&is_nil/1)
+  end
 end
