@@ -37,6 +37,7 @@ defmodule NorthwindElixirTraders.Joins do
     base_from(m)
     |> join(:inner, [o: o], od in assoc(o, :order_details), as: :od)
     |> join(:inner, [od: od], p in assoc(od, :product), as: :p)
+    |> join(:inner, [o: o], c in assoc(o, :customer), as: :c)
   end
 
   def entity_to_p_od(m) when m in @lhs do
@@ -55,10 +56,12 @@ defmodule NorthwindElixirTraders.Joins do
 
   def to_p_od_and_group(m), do: to_p_od_and_group(m, :id)
 
-  def to_p_od_and_group(m, field) when is_atom(field) do
+  def to_p_od_and_group(m, field)
+      when (m in @lhs or m in @rhs or m in [Product, Order]) and is_atom(field) do
     d_field =
       case m do
         Product -> dynamic([p: p], field(p, ^field))
+        Order -> dynamic([o: o], field(o, ^field))
         _ -> dynamic([x: x], field(x, ^field))
       end
 
@@ -79,15 +82,13 @@ defmodule NorthwindElixirTraders.Joins do
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
-  def p_od_group_and_select(m) when m in @lhs or m in @rhs or m == Product do
+  def p_od_group_and_select(m) when m in @lhs or m in @rhs or m in [Product, Order] do
     q = to_p_od_and_group(m)
 
-    case {has_named_binding?(q, :x), has_named_binding?(q, :p)} do
-      {true, true} ->
-        select(q, [x: x], %{id: x.id})
-
-      {false, true} ->
-        select(q, [p: p], %{id: p.id})
+    case m do
+      Product -> select(q, [p: p], %{id: p.id})
+      Order -> select(q, [o: o], %{id: o.id})
+      _ -> select(q, [x: x], %{id: x.id})
     end
     |> merge_quantity_revenue()
     |> merge_name(m)
