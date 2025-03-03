@@ -125,20 +125,32 @@ defmodule NorthwindElixirTraders.Joins do
   def xy(Order, Product), do: xy(Product, Order)
 
   # Connect LHS to OrderDetail via Product, and RHS to OrderDetail via Order
-  def xy(xm, Order) when xm in @lhs, do: xm |> join_lhs_to_od() |> join_od_to_order()
-  def xy(xm, Product) when xm in @rhs, do: xm |> join_rhs_to_od() |> join_od_to_product()
+  def xy(xm, Order) when xm in @lhs,
+    do: xm |> join_lhs_to_od() |> join_od_to_order()
+
+  def xy(xm, Product) when xm in @rhs,
+    do: xm |> join_rhs_to_od() |> join_od_to_product()
 
   # Connect Product to LHS schemas, and Order to RHS schemas
-  def xy(Product, ym) when ym in @lhs, do: xy(Product, Order) |> join_lhs_to_product(ym)
-  def xy(Order, ym) when ym in @rhs, do: xy(Order, Product) |> join_rhs_to_order(ym)
+  def xy(Product, ym) when ym in @lhs,
+    do: xy(Product, Order) |> join_lhs_to_product(ym)
+
+  def xy(Order, ym) when ym in @rhs,
+    do: xy(Order, Product) |> join_rhs_to_order(ym)
 
   # Connect LHS schemas to Product, and RHS schemas to Order
-  def xy(xm, Product) when xm in @lhs, do: xm |> join_lhs_to_od() |> join_od_to_order()
-  def xy(xm, Order) when xm in @rhs, do: xm |> join_rhs_to_od() |> join_od_to_product()
+  def xy(xm, Product) when xm in @lhs,
+    do: xm |> join_lhs_to_od() |> join_od_to_order()
+
+  def xy(xm, Order) when xm in @rhs,
+    do: xm |> join_rhs_to_od() |> join_od_to_product()
 
   # Connect Product to RHS schemas, and Order to LHS schemas
-  def xy(Product, ym) when ym in @rhs, do: xy(Product, Order) |> join_rhs_to_order(ym)
-  def xy(Order, ym) when ym in @lhs, do: xy(Order, Product) |> join_lhs_to_product(ym)
+  def xy(Product, ym) when ym in @rhs,
+    do: xy(Product, Order) |> join_rhs_to_order(ym)
+
+  def xy(Order, ym) when ym in @lhs,
+    do: xy(Order, Product) |> join_lhs_to_product(ym)
 
   # Connect LHS and RHS, passing through OrderDetail
   def xy(xm, ym) when xm in @lhs and xm != ym,
