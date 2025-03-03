@@ -56,7 +56,12 @@ defmodule NorthwindElixirTraders.Joins do
   def to_p_od_and_group(m), do: to_p_od_and_group(m, :id)
 
   def to_p_od_and_group(m, field) when is_atom(field) do
-    d_field = dynamic([x: x], field(x, ^field))
+    d_field =
+      case m do
+        Product -> dynamic([p: p], field(p, ^field))
+        _ -> dynamic([x: x], field(x, ^field))
+      end
+
     entity_to_p_od(m) |> group_by(^d_field)
   end
 
@@ -64,64 +69,51 @@ defmodule NorthwindElixirTraders.Joins do
       when is_list(opts) and m == Customer and field == :country,
       do: p_od_group_and_select(m, field) |> Insights.filter_by_date(opts)
 
-  def p_od_group_and_select(m, field) when m == Customer and field == :country do
-    to_p_od_and_group(m, field)
-    |> select([x: x, od: od, p: p], %{
-      id: x.id,
-      country: x.country,
-      quantity: sum(od.quantity),
-      revenue: sum(p.price * od.quantity)
-    })
-  end
+  def p_od_group_and_select(m, field) when m == Customer and field == :country,
+    do:
+      to_p_od_and_group(m, field)
+      |> select([x: x], %{id: x.id})
+      |> merge_quantity_revenue()
+      |> merge_name(m, field)
 
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
-  def p_od_group_and_select(m) when m == Product do
-    to_p_od_and_group(m)
-    |> select([x: x, od: od], %{
-      id: x.id,
-      name: x.name,
-      quantity: sum(od.quantity),
-      revenue: sum(x.price * od.quantity)
-    })
+  def p_od_group_and_select(m) when m in @lhs or m in @rhs or m == Product do
+    q = to_p_od_and_group(m)
+
+    case {has_named_binding?(q, :x), has_named_binding?(q, :p)} do
+      {true, true} ->
+        select(q, [x: x], %{id: x.id})
+
+      {false, true} ->
+        select(q, [p: p], %{id: p.id})
+    end
+    |> merge_quantity_revenue()
+    |> merge_name(m)
   end
 
-  def p_od_group_and_select(m) when m in @lhs do
-    to_p_od_and_group(m)
-    |> select([x: x, p: p, od: od], %{
-      id: x.id,
-      name: x.name,
-      quantity: sum(od.quantity),
-      revenue: sum(p.price * od.quantity)
-    })
-  end
+  def merge_quantity_revenue(%Ecto.Query{} = query),
+    do:
+      select_merge(query, [p: p, od: od], %{
+        quantity: sum(od.quantity),
+        revenue: sum(p.price * od.quantity)
+      })
 
-  def p_od_group_and_select(m) when m in @rhs do
-    to_p_od_and_group(m)
-    |> select([x: x, od: od, p: p], %{
-      id: x.id,
-      quantity: sum(od.quantity),
-      revenue: sum(p.price * od.quantity)
-    })
-    |> rhs_merge_name(m)
-  end
+  def merge_name(%Ecto.Query{} = query, m, field) when m == Customer and field == :country,
+    do: select_merge(query, [x: x], %{name: x.country})
 
-  def merge_quantity_revenue(%Ecto.Query{} = query) do
-    select_merge(query, [p: p, od: od], %{
-      quantity: sum(od.quantity),
-      revenue: sum(p.price * od.quantity)
-    })
-  end
-
-  def rhs_merge_name(%Ecto.Query{} = query, m) when m == Employee,
+  def merge_name(%Ecto.Query{} = query, m) when m == Employee,
     do:
       select_merge(query, [x: x], %{
         name: fragment("? || ' ' || ?", x.last_name, x.first_name)
       })
 
-  def rhs_merge_name(%Ecto.Query{} = query, m) when m in @rhs,
+  def merge_name(%Ecto.Query{} = query, m) when m in @rhs or m in @lhs,
     do: select_merge(query, [x: x], %{name: x.name})
+
+  def merge_name(%Ecto.Query{} = query, m) when m == Product,
+    do: select_merge(query, [p: p], %{name: p.name})
 
   def module_to_assoc_field(m) when m in @tables do
     Module.split(m) |> List.last() |> String.downcase() |> String.to_atom()
