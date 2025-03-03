@@ -386,18 +386,29 @@ defmodule NorthwindElixirTraders.Insights do
     d_pb = dynamic([x: x], field(x, ^partition_by))
     d_agg = dynamic_agg(agg)
 
-    from(q,
-      select: ^%{x: d_xm, agg: d_agg, agg_fn: agg},
+      from(q,
+        select: ^%{x: d_xm, agg: d_agg, agg_fn: agg},
       windows: [part: [partition_by: ^d_pb]]
-    )
+      )
   end
 
-  def dynamic_agg(agg) when agg in [:sum, :min, :max, :avg] do
+  def dynamic_agg(agg, :revenue) when agg in [:sum, :min, :max, :avg, :count] do
     case agg do
       :sum -> dynamic([od: od, p: p], sum(od.quantity * p.price) |> over(:part))
       :min -> dynamic([od: od, p: p], min(od.quantity * p.price) |> over(:part))
       :avg -> dynamic([od: od, p: p], avg(od.quantity * p.price) |> over(:part))
       :max -> dynamic([od: od, p: p], max(od.quantity * p.price) |> over(:part))
+      :count -> raise ArgumentError, ":count is not supported for the :revenue metric"
+    end
+  end
+
+  def dynamic_agg(agg, :quantity) when agg in [:sum, :min, :max, :avg, :count] do
+    case agg do
+      :sum -> dynamic([od: od], sum(od.quantity) |> over(:part))
+      :min -> dynamic([od: od], min(od.quantity) |> over(:part))
+      :avg -> dynamic([od: od], avg(od.quantity) |> over(:part))
+      :max -> dynamic([od: od], max(od.quantity) |> over(:part))
+      :count -> dynamic([od: od], max(od.quantity) |> over(:part))
     end
   end
 end
