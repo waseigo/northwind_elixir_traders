@@ -135,6 +135,11 @@ defmodule NorthwindElixirTraders.Joins do
   def merge_name(%Ecto.Query{} = query, m) when m == Product,
     do: select_merge(query, [p: p], %{name: p.name})
 
+  def merge_name(%Ecto.Query{from: %{source: {_table, m}}} = query, field) when is_atom(field),
+    do: merge_name(query, m, field)
+
+  def merge_name(%Ecto.Query{from: %{source: {_table, m}}} = query), do: merge_name(query, m)
+
   def module_to_assoc_field(m) when m in @tables do
     Module.split(m) |> List.last() |> String.downcase() |> String.to_atom()
   end
