@@ -77,7 +77,7 @@ defmodule NorthwindElixirTraders.Joins do
       to_p_od_and_group(m, field)
       |> select([x: x], %{id: x.id})
       |> merge_quantity_revenue()
-      |> merge_name(m, field)
+      |> merge_name(field)
 
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
@@ -91,7 +91,7 @@ defmodule NorthwindElixirTraders.Joins do
       _ -> select(q, [x: x], %{id: x.id})
     end
     |> merge_quantity_revenue()
-    |> merge_name(m)
+    |> merge_name()
   end
 
   def merge_quantity_revenue(%Ecto.Query{} = query),
