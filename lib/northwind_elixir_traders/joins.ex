@@ -10,7 +10,8 @@ defmodule NorthwindElixirTraders.Joins do
     Employee,
     Shipper,
     Customer,
-    Insights
+    Insights,
+    Repo
   }
 
   @tables [Supplier, Category, Product, OrderDetail, Order, Employee, Shipper, Customer]
@@ -181,4 +182,7 @@ defmodule NorthwindElixirTraders.Joins do
     |> List.flatten()
     |> Enum.reject(&is_nil/1)
   end
+
+  def calc_total_revenues({xm, ym}),
+    do: xy(xm, ym) |> select([p: p, od: od], sum(p.price * od.quantity)) |> Repo.one()
 end
