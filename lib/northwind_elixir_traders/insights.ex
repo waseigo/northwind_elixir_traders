@@ -14,7 +14,9 @@ defmodule NorthwindElixirTraders.Insights do
     Joins
   }
 
-  @tables [Customer, Employee, Shipper, Category, Supplier, Product, OrderDetail, Order]
+  @tables [Supplier, Category, Product, OrderDetail, Order, Employee, Shipper, Customer]
+  @lhs Enum.slice(@tables, 0..1)
+  @rhs Enum.slice(@tables, -3..-1)
   @m_tables @tables -- [Order, OrderDetail]
   @timeout 10_000
   @max_concurrency System.schedulers_online()
@@ -376,21 +378,26 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def query_entity_window_dynamic(m, xm, agg \\ :sum, metric \\ :revenue, partition_by \\ :id)
-      when m in @m_tables and
-             is_atom(xm) and agg in [:sum, :min, :max, :avg, :count] and is_atom(metric) and
-             is_atom(partition_by) do
-    q = Joins.entity_to_p_od(m) |> distinct(true)
+      when (m in @lhs or m in @rhs) and is_atom(metric) and is_atom(partition_by) and
+             is_atom(xm) and agg in [:sum, :min, :max, :avg, :count] do
+    q = Joins.xy(m, Product) |> distinct(true)
 
     d_xm = dynamic([x: x], field(x, ^xm))
     d_pb = dynamic([x: x], field(x, ^partition_by))
-    d_sum = dynamic([x: x, p: p, od: od], sum(od.quantity * p.price) |> over(:part))
+    d_agg = dynamic_agg(agg)
 
+    from(q,
+      select: ^%{x: d_xm, agg: d_agg, agg_fn: agg},
+      windows: [part: [partition_by: ^d_pb]]
+    )
+  end
+
+  def dynamic_agg(agg) when agg in [:sum, :min, :max, :avg] do
     case agg do
-      :sum ->
-        from(q,
-          select: ^%{x: d_xm, agg: d_sum},
-          windows: [part: [partition_by: ^d_pb]]
-        )
+      :sum -> dynamic([od: od, p: p], sum(od.quantity * p.price) |> over(:part))
+      :min -> dynamic([od: od, p: p], min(od.quantity * p.price) |> over(:part))
+      :avg -> dynamic([od: od, p: p], avg(od.quantity * p.price) |> over(:part))
+      :max -> dynamic([od: od, p: p], max(od.quantity * p.price) |> over(:part))
     end
   end
 end
