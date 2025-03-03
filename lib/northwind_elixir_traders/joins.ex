@@ -26,13 +26,16 @@ defmodule NorthwindElixirTraders.Joins do
   def base_from(m) when m in @lhs or m in @rhs or m == Product, do: from(x in m, as: :x)
 
   def entity_to_p_od(m) when m == Product do
-    base_from(m) |> join(:inner, [x: x], od in assoc(x, :order_details), as: :od)
+    base_from(m)
+    |> join(:inner, [x: x], od in assoc(x, :order_details), as: :od)
+    |> join(:inner, [od: od], o in assoc(od, :order), as: :o)
   end
 
   def entity_to_p_od(m) when m in @lhs do
     base_from(m)
     |> join(:inner, [x: x], p in assoc(x, :products), as: :p)
     |> join(:inner, [p: p], od in assoc(p, :order_details), as: :od)
+    |> join(:inner, [od: od], o in assoc(od, :order), as: :o)
   end
 
   def entity_to_p_od(m) when m in @rhs do
