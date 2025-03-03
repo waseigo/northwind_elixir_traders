@@ -23,7 +23,9 @@ defmodule NorthwindElixirTraders.Joins do
   def get_tables(:both), do: @lhs ++ @rhs
   def get_tables(:all), do: @tables
 
-  def base_from(m) when m in @lhs or m in @rhs or m == Product, do: from(x in m, as: :x)
+  def base_from(m) when m in @lhs or m in @rhs, do: from(x in m, as: :x)
+  def base_from(m) when m == Product, do: from(p in m, as: :p)
+  def base_from(m) when m == Order, do: from(o in m, as: :o)
 
   def entity_to_p_od(m) when m == Product do
     base_from(m)
