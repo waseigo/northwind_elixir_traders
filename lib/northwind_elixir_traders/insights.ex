@@ -377,19 +377,28 @@ defmodule NorthwindElixirTraders.Insights do
     |> Kernel./(reps)
   end
 
-  def query_entity_window_dynamic(m, xm, agg \\ :sum, metric \\ :revenue, partition_by \\ :id)
-      when (m in @lhs or m in @rhs) and is_atom(metric) and is_atom(partition_by) and
-             is_atom(xm) and agg in [:sum, :min, :max, :avg, :count] do
+  def query_entity_window_dynamic(m, xm, opts \\ [])
+      when (m in @lhs or m in @rhs) and is_atom(xm) and is_list(opts) do
+    agg = Keyword.get(opts, :agg, :sum)
+    metric = Keyword.get(opts, :metric, :revenue)
+    partition_by = Keyword.get(opts, :partition_by, :id)
+    order = Keyword.get(opts, :order, :desc)
+    limit = Keyword.get(opts, :limit)
+
     q = Joins.xy(m, Product) |> distinct(true)
 
     d_xm = dynamic([x: x], field(x, ^xm))
     d_pb = dynamic([x: x], field(x, ^partition_by))
-    d_agg = dynamic_agg(agg)
+    d_agg = dynamic_agg(agg, metric)
 
+    q =
       from(q,
-        select: ^%{x: d_xm, agg: d_agg, agg_fn: agg},
-      windows: [part: [partition_by: ^d_pb]]
+        select: ^%{x: d_xm, agg: d_agg},
+        windows: [part: [partition_by: ^d_pb]],
+        order_by: ^[{order, d_agg}]
       )
+
+    if is_integer(limit) and limit > 0, do: limit(q, ^limit), else: q
   end
 
   def dynamic_agg(agg, :revenue) when agg in [:sum, :min, :max, :avg, :count] do
