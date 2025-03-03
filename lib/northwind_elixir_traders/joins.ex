@@ -103,6 +103,25 @@ defmodule NorthwindElixirTraders.Joins do
   def merge_name(%Ecto.Query{} = query, m, field) when m == Customer and field == :country,
     do: select_merge(query, [x: x], %{name: x.country})
 
+  def merge_name(%Ecto.Query{} = query, m) when m == Order do
+    d_frag =
+      case Ecto.Adapter.lookup_meta(Repo)[:adapter] do
+        Ecto.Adapters.SQLite3 ->
+          dynamic([o: o, c: c], fragment("strftime('%Y-%m-%d', ?) || ' - ' || ?", o.date, c.name))
+
+        Ecto.Adapters.Postgres ->
+          dynamic(
+            [o: o, c: c],
+            fragment("to_char(?, 'YYYY-MM-DD') || ' - ' || ?", o.date, c.name)
+          )
+
+        _ ->
+          dynamic([o: o, c: c], fragment("? || ' - ' || ?", o.date, c.name))
+      end
+
+    select_merge(query, [o: o, c: c], ^%{name: d_frag})
+  end
+
   def merge_name(%Ecto.Query{} = query, m) when m == Employee,
     do:
       select_merge(query, [x: x], %{
