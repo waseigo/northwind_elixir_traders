@@ -123,6 +123,10 @@ defmodule NorthwindElixirTraders.Joins do
 
   def xy(Order, Product), do: xy(Product, Order)
 
+  # Connect LHS to OrderDetail via Product, and RHS to OrderDetail via Order
+  def xy(xm, Order) when xm in @lhs, do: xm |> join_lhs_to_od() |> join_od_to_order()
+  def xy(xm, Product) when xm in @rhs, do: xm |> join_rhs_to_od() |> join_od_to_product()
+
   def join_od_to_product(query = %Ecto.Query{}),
     do: join(query, :inner, [od: od], p in assoc(od, :product), as: :p)
 
