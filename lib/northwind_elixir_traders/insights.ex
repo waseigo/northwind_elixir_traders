@@ -420,4 +420,13 @@ defmodule NorthwindElixirTraders.Insights do
       :count -> dynamic([od: od], max(od.quantity) |> over(:part))
     end
   end
+
+  def revenues_running_total() do
+    Joins.xy(Product, Order)
+    |> windows([o: o], w: [order_by: [asc: o.date]])
+    |> select(
+      [o: o, od: od, p: p],
+      %{date: o.date, agg: sum(od.quantity * p.price) |> over(:w)}
+    )
+  end
 end
