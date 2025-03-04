@@ -422,11 +422,14 @@ defmodule NorthwindElixirTraders.Insights do
   end
 
   def revenues_running_total() do
-    Joins.xy(Product, Order)
+    Joins.xy(Customer, Product)
     |> windows([o: o], w: [order_by: [asc: o.date]])
-    |> select(
-      [o: o, od: od, p: p],
-      %{date: o.date, agg: sum(od.quantity * p.price) |> over(:w)}
-    )
+    |> select([x: x, o: o, od: od, p: p], %{
+      date: o.date,
+      customer: x.name,
+      order_id: o.id,
+      od_id: od.id,
+      agg: sum(od.quantity * p.price) |> over(:w)
+    })
   end
 end
