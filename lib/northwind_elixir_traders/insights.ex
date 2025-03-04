@@ -421,6 +421,9 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
+  def revenues_running_total(opts) when is_list(opts),
+    do: revenues_running_total() |> filter_by_date(opts)
+
   def revenues_running_total() do
     Joins.xy(Order, Product)
     |> order_by([o: o], asc: o.date)
