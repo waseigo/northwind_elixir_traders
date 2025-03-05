@@ -73,26 +73,13 @@ defmodule NorthwindElixirTraders.Joins do
       do: p_od_group_and_select(m, field) |> Insights.filter_by_date(opts)
 
   def p_od_group_and_select(m, field) when m == Customer and field == :country,
-    do:
-      to_p_od_and_group(m, field)
-      |> select([x: x], %{id: x.id})
-      |> merge_quantity_revenue()
-      |> merge_name(field)
+    do: to_p_od_and_group(m, field) |> merge_id() |> merge_quantity_revenue() |> merge_name(field)
 
   def p_od_group_and_select(m, opts) when is_list(opts),
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
-  def p_od_group_and_select(m) when m in @lhs or m in @rhs or m in [Product, Order] do
-    q = to_p_od_and_group(m)
-
-    case m do
-      Product -> select(q, [p: p], %{id: p.id})
-      Order -> select(q, [o: o], %{id: o.id})
-      _ -> select(q, [x: x], %{id: x.id})
-    end
-    |> merge_quantity_revenue()
-    |> merge_name()
-  end
+  def p_od_group_and_select(m) when m in @lhs or m in @rhs or m in [Product, Order],
+    do: to_p_od_and_group(m) |> merge_id() |> merge_quantity_revenue() |> merge_name()
 
   def merge_quantity_revenue(%Ecto.Query{} = query),
     do:
@@ -247,11 +234,14 @@ defmodule NorthwindElixirTraders.Joins do
     select_merge(query, [p: p, od: od], ^%{agg: Insights.dynamic_agg(agg, metric)})
   end
 
-  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query) when m in @rhs or m in @lhs,
-    do: select(query, [x: x], %{id: x.id})
-
-  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query) when m == Product,
-    do: select(query, [p: p], %{id: p.id})
+  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
+      when m in @rhs or m in @lhs or m in [Product, Order] do
+    case m do
+      Product -> select(query, [p: p], %{id: p.id})
+      Order -> select(query, [o: o], %{id: o.id})
+      _ -> select(query, [x: x], %{id: x.id})
+    end
+  end
 
   def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
       when m in @rhs or m in @lhs or m == Product,
