@@ -449,6 +449,15 @@ defmodule NorthwindElixirTraders.Insights do
     |> distinct(true)
   end
 
+  def fetch_date_filter_opts(opts \\ []) when is_list(opts) do
+    Enum.reduce([:year, :month, :start, :end], [], fn k, acc ->
+      v = Keyword.get(opts, k)
+      if !is_nil(v), do: Keyword.put(acc, k, v), else: acc
+    end)
+    |> Keyword.put(:field, :date)
+    |> Enum.reverse()
+  end
+
   def disagg_rows_by_field(rows, field) when is_list(rows) and is_atom(field) do
     Enum.reduce(rows, %{}, fn r, acc ->
       Map.update(acc, r[field], [Map.delete(r, field)], &[Map.delete(r, field) | &1])
