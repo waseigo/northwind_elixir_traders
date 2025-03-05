@@ -507,4 +507,17 @@ defmodule NorthwindElixirTraders.Insights do
         )
     end
   end
+
+  def query_order_revenues(xm, ym)
+      when (xm in @lhs and ym in @rhs) or (xm in @rhs and ym in @lhs) do
+    Joins.xy(xm, ym)
+    |> group_by([o: o], o.id)
+    |> select([x: x, o: o, od: od, p: p, y: y], %{
+      order_id: o.id,
+      date: o.date,
+      x_id: x.id,
+      y_id: y.id,
+      revenue: sum(od.quantity * p.price)
+    })
+  end
 end
