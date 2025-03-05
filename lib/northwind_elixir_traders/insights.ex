@@ -449,6 +449,22 @@ defmodule NorthwindElixirTraders.Insights do
     |> distinct(true)
   end
 
+  def running(m, opts \\ []) when (m in @lhs or m in @rhs or m == Product) and is_list(opts) do
+    agg = Keyword.get(opts, :agg, :sum)
+    metric = Keyword.get(opts, :metric, :revenue)
+    order = Keyword.get(opts, :order, :asc)
+    date_opts = fetch_date_filter_opts(opts)
+
+    Joins.xy(m, Order)
+    |> window_expanding_by_order_date(order: order)
+    |> Joins.merge_id()
+    |> Joins.merge_order_id()
+    |> Joins.merge_name()
+    |> Joins.merge_agg(agg, metric)
+    |> distinct(true)
+    |> filter_by_date(date_opts)
+  end
+
   def fetch_date_filter_opts(opts \\ []) when is_list(opts) do
     Enum.reduce([:year, :month, :start, :end], [], fn k, acc ->
       v = Keyword.get(opts, k)
