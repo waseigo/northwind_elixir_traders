@@ -463,11 +463,14 @@ defmodule NorthwindElixirTraders.Insights do
     |> Enum.sum_by(& &1.agg)
   end
 
-  def window_expanding_by_order_date(%Ecto.Query{} = query, m)
-      when m in @m_tables and m != Product,
-      do: windows(query, [x: x, o: o], part: [partition_by: x.id, order_by: [asc: o.date]])
+  def window_expanding_by_order_date(%Ecto.Query{from: %{source: {_table, m}}} = query)
+      when m in @m_tables do
+    case m do
+      Product ->
+        windows(query, [x: x, o: o], part: [partition_by: x.id, order_by: [asc: o.date]])
 
-  def window_expanding_by_order_date(%Ecto.Query{} = query, m)
-      when m in @m_tables and m == Product,
-      do: windows(query, [p: p, o: o], part: [partition_by: p.id, order_by: [asc: o.date]])
+      _ ->
+        windows(query, [p: p, o: o], part: [partition_by: p.id, order_by: [asc: o.date]])
+    end
+  end
 end
