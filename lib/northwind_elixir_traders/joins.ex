@@ -241,4 +241,9 @@ defmodule NorthwindElixirTraders.Joins do
     correct = 38_642_423
     combs |> Enum.map(&calc_total_revenues/1) |> Enum.reject(&(&1 != {correct, correct}))
   end
+
+  def merge_agg(%Ecto.Query{} = query, agg, metric)
+      when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] do
+    select_merge(query, [p: p, od: od], ^%{agg: Insights.dynamic_agg(agg, metric)})
+  end
 end
