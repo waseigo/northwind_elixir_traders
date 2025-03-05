@@ -435,4 +435,17 @@ defmodule NorthwindElixirTraders.Insights do
       agg: sum(od.quantity * p.price) |> over(:w)
     })
   end
+
+  def revenues_running_total_per_customer() do
+    Joins.xy(Customer, Product)
+    |> windows([x: x, o: o], part: [partition_by: x.id, order_by: [asc: o.date]])
+    |> select([x: x, o: o, od: od, p: p], %{
+      x_id: x.id,
+      x: x.name,
+      date: o.date,
+      order_id: o.id,
+      agg: sum(od.quantity * p.price) |> over(:part)
+    })
+    |> distinct(true)
+  end
 end
