@@ -456,4 +456,10 @@ defmodule NorthwindElixirTraders.Insights do
     |> Enum.map(fn {field_key, disagg_rows} -> {field_key, Enum.reverse(disagg_rows)} end)
     |> Map.new()
   end
+
+  def calculate_sum_of_max_running_totals(disaggregated) when is_map(disaggregated) do
+    disaggregated
+    |> Enum.map(fn {_k, rows} -> Enum.sort_by(rows, & &1.agg, :desc) |> hd end)
+    |> Enum.sum_by(& &1.agg)
+  end
 end
