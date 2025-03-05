@@ -246,4 +246,10 @@ defmodule NorthwindElixirTraders.Joins do
       when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] do
     select_merge(query, [p: p, od: od], ^%{agg: Insights.dynamic_agg(agg, metric)})
   end
+
+  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query) when m in @rhs or m in @lhs,
+    do: select(query, [x: x], %{id: x.id})
+
+  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query) when m == Product,
+    do: select(query, [p: p], %{id: p.id})
 end
