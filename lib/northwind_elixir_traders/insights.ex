@@ -448,4 +448,12 @@ defmodule NorthwindElixirTraders.Insights do
     })
     |> distinct(true)
   end
+
+  def disagg_rows_by_field(rows, field) when is_list(rows) and is_atom(field) do
+    Enum.reduce(rows, %{}, fn r, acc ->
+      Map.update(acc, r[field], [Map.delete(r, field)], &[Map.delete(r, field) | &1])
+    end)
+    |> Enum.map(fn {field_key, disagg_rows} -> {field_key, Enum.reverse(disagg_rows)} end)
+    |> Map.new()
+  end
 end
