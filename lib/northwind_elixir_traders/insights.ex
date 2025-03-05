@@ -462,4 +462,12 @@ defmodule NorthwindElixirTraders.Insights do
     |> Enum.map(fn {_k, rows} -> Enum.sort_by(rows, & &1.agg, :desc) |> hd end)
     |> Enum.sum_by(& &1.agg)
   end
+
+  def window_expanding_by_order_date(%Ecto.Query{} = query, m)
+      when m in @m_tables and m != Product,
+      do: windows(query, [x: x, o: o], part: [partition_by: x.id, order_by: [asc: o.date]])
+
+  def window_expanding_by_order_date(%Ecto.Query{} = query, m)
+      when m in @m_tables and m == Product,
+      do: windows(query, [p: p, o: o], part: [partition_by: p.id, order_by: [asc: o.date]])
 end
