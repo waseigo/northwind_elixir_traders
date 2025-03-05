@@ -520,4 +520,17 @@ defmodule NorthwindElixirTraders.Insights do
       revenue: sum(od.quantity * p.price)
     })
   end
+
+  def query_order_revenues(Product, Order), do: query_order_revenues()
+  def query_order_revenues(Order, Product), do: query_order_revenues()
+
+  def query_order_revenues() do
+    Joins.xy(Product, Order)
+    |> group_by([o: o], o.id)
+    |> select([o: o, od: od, p: p], %{
+      order_id: o.id,
+      date: o.date,
+      revenue: sum(od.quantity * p.price)
+    })
+  end
 end
