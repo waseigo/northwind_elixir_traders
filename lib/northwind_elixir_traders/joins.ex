@@ -252,4 +252,8 @@ defmodule NorthwindElixirTraders.Joins do
 
   def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query) when m == Product,
     do: select(query, [p: p], %{id: p.id})
+
+  def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
+      when m in @rhs or m in @lhs or m == Product,
+      do: select_merge(query, [o: o], %{order_id: o.id})
 end
