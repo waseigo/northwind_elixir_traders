@@ -150,14 +150,12 @@ defmodule NorthwindElixirTraders.Joins do
   def xy(xm, ym) when xm in @rhs and ym in @lhs,
     do: join_rhs_to_od(xm) |> join_od_to_product() |> join_lhs_to_product(ym)
 
-  # Connect Product and Order via OrderDetail (the order doesn't matter)
-  def xy(Product, Order) do
-    from(od in OrderDetail, as: :od)
-    |> join_od_to_product()
-    |> join_od_to_order()
-  end
+  # Connect Product and Order via OrderDetail
+  def xy(Product, Order),
+    do: from(p in Product, as: :p) |> join_product_to_od() |> join_od_to_order()
 
-  def xy(Order, Product), do: xy(Product, Order)
+  def xy(Order, Product),
+    do: from(o in Order, as: :o) |> join_order_to_od() |> join_od_to_product()
 
   # Connect LHS to OrderDetail via Product, and RHS to OrderDetail via Order
   def xy(xm, Order) when xm in @lhs,
