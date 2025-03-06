@@ -229,10 +229,19 @@ defmodule NorthwindElixirTraders.Joins do
     combs |> Enum.map(&calc_total_revenues/1) |> Enum.reject(&(&1 != {correct, correct}))
   end
 
-  def merge_agg(%Ecto.Query{} = query, agg, metric)
+  def merge_agg(%Ecto.Query{} = query, agg, metric, field \\ :agg)
       when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] do
-    select_merge(query, [p: p, od: od], ^%{agg: Insights.dynamic_agg(agg, metric)})
+    if is_sliding?(query) do
+      d_agg = Insights.dynamic_agg(agg, metric, :rolling, field)
+      select_merge(query, [s], ^%{{field, d_agg}})
+    else
+      d_agg = Insights.dynamic_agg(agg, metric)
+      select_merge(query, [p: p, od: od], ^%{{field, d_agg}})
+    end
   end
+
+  def is_sliding?(%Ecto.Query{} = query),
+    do: :frame in (query.windows |> Keyword.get(:part) |> Map.get(:expr) |> Keyword.keys())
 
   # optional argument
   def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query, field \\ :id)
