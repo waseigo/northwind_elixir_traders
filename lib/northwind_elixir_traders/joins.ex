@@ -230,7 +230,7 @@ defmodule NorthwindElixirTraders.Joins do
   end
 
   def merge_agg(%Ecto.Query{} = query, agg, metric, field \\ :agg)
-      when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] do
+      when agg in [:sum, :min, :max, :avg] and metric in [:revenue, :quantity] do
     if is_sliding?(query) do
       d_agg = Insights.dynamic_agg(agg, metric, :rolling, field)
       select_merge(query, [s], ^%{{field, d_agg}})

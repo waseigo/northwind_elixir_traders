@@ -401,28 +401,26 @@ defmodule NorthwindElixirTraders.Insights do
     if is_integer(limit) and limit > 0, do: limit(q, ^limit), else: q
   end
 
-  def dynamic_agg(agg, :revenue) when agg in [:sum, :min, :max, :avg, :count] do
+  def dynamic_agg(agg, :revenue) when agg in [:sum, :min, :max, :avg] do
     case agg do
       :sum -> dynamic([od: od, p: p], sum(od.quantity * p.price) |> over(:part))
       :min -> dynamic([od: od, p: p], min(od.quantity * p.price) |> over(:part))
       :avg -> dynamic([od: od, p: p], avg(od.quantity * p.price) |> over(:part))
       :max -> dynamic([od: od, p: p], max(od.quantity * p.price) |> over(:part))
-      :count -> raise ArgumentError, ":count is not supported for the :revenue metric"
     end
   end
 
-  def dynamic_agg(agg, :quantity) when agg in [:sum, :min, :max, :avg, :count] do
+  def dynamic_agg(agg, :quantity) when agg in [:sum, :min, :max, :avg] do
     case agg do
       :sum -> dynamic([od: od], sum(od.quantity) |> over(:part))
       :min -> dynamic([od: od], min(od.quantity) |> over(:part))
       :avg -> dynamic([od: od], avg(od.quantity) |> over(:part))
       :max -> dynamic([od: od], max(od.quantity) |> over(:part))
-      :count -> dynamic([od: od], max(od.quantity) |> over(:part))
     end
   end
 
   def dynamic_agg(agg, metric, :rolling, field \\ :agg)
-      when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] and
+      when agg in [:sum, :min, :max, :avg] and metric in [:revenue, :quantity] and
              is_atom(field) do
     d_field = dynamic([s], field(s, ^field))
 
@@ -438,12 +436,6 @@ defmodule NorthwindElixirTraders.Insights do
 
       :max ->
         dynamic([s], max(^d_field) |> over(:part))
-
-      :count ->
-        case metric do
-          :revenue -> raise ArgumentError, ":count is not supported for the :revenue metric"
-          :quantity -> dynamic([s], count(^d_field) |> over(:part))
-        end
     end
   end
 
@@ -569,7 +561,7 @@ defmodule NorthwindElixirTraders.Insights do
     do: rolling_agg_of_order_revenues(:avg, n)
 
   def rolling_agg_of_order_revenues(agg, n \\ 7)
-      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count],
+      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum],
       do: rolling(n, agg: agg, metric: :revenue)
 
   def rolling(n, opts)
