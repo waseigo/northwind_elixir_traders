@@ -565,20 +565,17 @@ defmodule NorthwindElixirTraders.Insights do
   #     })
   #     |> Joins.merge_metric(metric)
 
-  def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0 do
-    query_order_revenues()
+  def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0,
+    do: rolling_agg_of_order_revenues(:avg, n)
+
+  def rolling_agg_of_order_revenues(agg, n \\ 7)
+      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
+    metric = :revenue
+
+    query_order_metric(Product, Order, metric)
     |> subquery()
-    |> windows([s],
-      part: [order_by: [asc: s.date], frame: fragment("ROWS ? PRECEDING", ^n - 1)]
-    )
-    |> select([s], %{date: s.date, agg: avg(s.revenue) |> over(:part)})
+    |> window_sliding_by_order_date(n)
+    |> select([s], %{date: s.date})
+    |> select_merge([s], ^%{agg: dynamic_agg(agg, metric, :rolling, :agg)})
   end
-
-  # def rolling_agg_of_order_revenues(n, agg \\ :avg)
-  #     when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
-  #   agg_fn = fn x -> apply(Ecto.Query.WindowAPI, agg, [x]) end
-
-  #   d_agg = dynamic([s], agg_fn.(s.revenue) |> over(:part))
-  #   # …
-  # end
 end
