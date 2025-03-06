@@ -542,4 +542,12 @@ defmodule NorthwindElixirTraders.Insights do
     )
     |> select([s], %{date: s.date, agg: avg(s.revenue) |> over(:part)})
   end
+
+  def rolling_agg_of_order_revenues(n, agg \\ :avg)
+      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
+    agg_fn = fn x -> apply(Ecto.Query.WindowAPI, agg, [x]) end
+
+    d_agg = dynamic([s], agg_fn.(s.revenue) |> over(:part))
+    # …
+  end
 end
