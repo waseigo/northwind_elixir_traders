@@ -569,13 +569,18 @@ defmodule NorthwindElixirTraders.Insights do
     do: rolling_agg_of_order_revenues(:avg, n)
 
   def rolling_agg_of_order_revenues(agg, n \\ 7)
-      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
-    metric = :revenue
+      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count],
+      do: rolling(n, agg: agg, metric: :revenue)
+
+  def rolling(n, opts)
+      when is_integer(n) and n > 0 and is_list(opts) do
+    agg = Keyword.get(opts, :agg, :sum)
+    metric = Keyword.get(opts, :metric, :revenue)
 
     query_order_metric(Product, Order, metric)
     |> subquery()
     |> window_sliding_by_order_date(n)
     |> select([s], %{date: s.date})
-    |> select_merge([s], ^%{agg: dynamic_agg(agg, metric, :rolling, :agg)})
+    |> Joins.merge_agg(agg, metric, :agg)
   end
 end
