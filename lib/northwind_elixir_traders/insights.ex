@@ -534,6 +534,12 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
+  def window_sliding_by_order_date(%Ecto.SubQuery{} = query, n \\ 7)
+      when is_integer(n) and n > 0 do
+    d_frag = dynamic(fragment("ROWS ? PRECEDING", ^n - 1))
+    windows(query, [s], part: [order_by: [asc: s.date], frame: ^d_frag])
+  end
+
   def query_order_revenues(xm, ym), do: query_order_metric(xm, ym, :revenue)
   def query_order_revenues(), do: query_order_metric(Product, Order, :revenue)
 
