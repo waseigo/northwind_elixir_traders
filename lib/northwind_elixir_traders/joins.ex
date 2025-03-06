@@ -250,6 +250,22 @@ defmodule NorthwindElixirTraders.Joins do
 
   def merge_x_id(%Ecto.Query{} = query), do: merge_id(query, :x_id)
 
+  def merge_y_id(%Ecto.Query{from: %{source: {_table, xm}}} = query, ym)
+      when ym != xm and (ym in @lhs or ym in @rhs or ym in [Product, Order]) do
+    case ym do
+      Product ->
+        select_merge(query, [p: p], %{y_id: p.id})
+
+      Order ->
+        select_merge(query, [o: o], %{y_id: o.id})
+
+      _ ->
+        if has_named_binding?(query, :y),
+          do: select_merge(query, [y: y], %{y_id: y.id}),
+          else: query
+    end
+  end
+
   def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
       when m in @rhs or m in @lhs or m in [Product, Order],
       do: select_merge(query, [o: o], %{order_id: o.id})
