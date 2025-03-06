@@ -421,6 +421,32 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
+  def dynamic_agg(agg, metric, :rolling, field \\ :agg)
+      when agg in [:sum, :min, :max, :avg, :count] and metric in [:revenue, :quantity] and
+             is_atom(field) do
+    d_field = dynamic([s], field(s, ^field))
+
+    case agg do
+      :sum ->
+        dynamic([s], sum(^d_field) |> over(:part))
+
+      :min ->
+        dynamic([s], min(^d_field) |> over(:part))
+
+      :avg ->
+        dynamic([s], avg(^d_field) |> over(:part))
+
+      :max ->
+        dynamic([s], max(^d_field) |> over(:part))
+
+      :count ->
+        case metric do
+          :revenue -> raise ArgumentError, ":count is not supported for the :revenue metric"
+          :quantity -> dynamic([s], count(^d_field) |> over(:part))
+        end
+    end
+  end
+
   def revenues_running_total(opts) when is_list(opts),
     do: revenues_running_total() |> filter_by_date(opts)
 
