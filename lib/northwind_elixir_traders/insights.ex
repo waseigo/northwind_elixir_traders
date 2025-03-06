@@ -537,9 +537,9 @@ defmodule NorthwindElixirTraders.Insights do
   def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0 do
     query_order_revenues()
     |> subquery()
-    |> windows([o: o],
-      part: [order_by: [asc: o.date], frame: fragment("ROWS ? PRECEDING", ^n - 1)]
+    |> windows([s],
+      part: [order_by: [asc: s.date], frame: fragment("ROWS ? PRECEDING", ^n - 1)]
     )
-    |> select([o: o], %{date: o.date, agg: avg(o.revenue) |> over(:part)})
+    |> select([s], %{date: s.date, agg: avg(s.revenue) |> over(:part)})
   end
 end
