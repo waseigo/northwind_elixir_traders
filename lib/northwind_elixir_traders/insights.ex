@@ -246,27 +246,37 @@ defmodule NorthwindElixirTraders.Insights do
       when opts in [[field: :date], [field: :birth_date]],
       do: query
 
-  def filter_by_date(query = %Ecto.Query{}, start: s = %Date{}, field: field)
+  def filter_by_date(query = %Ecto.Query{}, start: d = %Date{}, field: field)
       when field in [:date, :birth_date] do
-    s = if field == :date, do: to_utc_datetime!(s, :start), else: s
+    d = if field == :date, do: to_utc_datetime!(d, :start), else: d
 
     w =
       case field do
-        :date -> dynamic([o: o], field(o, ^field) >= ^s)
-        :birth_date -> dynamic([x: x], field(x, ^field) >= ^s)
+        :date ->
+          if has_named_binding?(query, :o),
+            do: dynamic([o: o], field(o, ^field) >= ^d),
+            else: dynamic([s], field(s, ^field) >= ^d)
+
+        :birth_date ->
+          dynamic([x: x], field(x, ^field) >= ^d)
       end
 
     where(query, ^w)
   end
 
-  def filter_by_date(query = %Ecto.Query{}, end: e = %Date{}, field: field)
+  def filter_by_date(query = %Ecto.Query{}, end: d = %Date{}, field: field)
       when field in [:date, :birth_date] do
-    e = if field == :date, do: to_utc_datetime!(e, :end), else: e
+    d = if field == :date, do: to_utc_datetime!(d, :end), else: d
 
     w =
       case field do
-        :date -> dynamic([o: o], field(o, ^field) <= ^e)
-        :birth_date -> dynamic([x: x], field(x, ^field) <= ^e)
+        :date ->
+          if has_named_binding?(query, :o),
+            do: dynamic([o: o], field(o, ^field) <= ^d),
+            else: dynamic([s], field(s, ^field) <= ^d)
+
+        :birth_date ->
+          dynamic([x: x], field(x, ^field) <= ^d)
       end
 
     where(query, ^w)
