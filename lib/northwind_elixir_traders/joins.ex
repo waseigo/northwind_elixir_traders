@@ -234,14 +234,21 @@ defmodule NorthwindElixirTraders.Joins do
     select_merge(query, [p: p, od: od], ^%{agg: Insights.dynamic_agg(agg, metric)})
   end
 
-  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
-      when m in @rhs or m in @lhs or m in [Product, Order] do
+  # optional argument
+  def merge_id(%Ecto.Query{from: %{source: {_table, m}}} = query, field \\ :id)
+      # add guard
+      when m in @rhs or m in @lhs or (m in [Product, Order] and is_atom(field)) do
     case m do
-      Product -> select(query, [p: p], %{id: p.id})
-      Order -> select(query, [o: o], %{id: o.id})
-      _ -> select(query, [x: x], %{id: x.id})
+      # flexible field name
+      Product -> select(query, [p: p], %{{^field, p.id}})
+      # flexible field name
+      Order -> select(query, [o: o], %{{^field, o.id}})
+      # flexible field name
+      _ -> select(query, [x: x], %{{^field, x.id}})
     end
   end
+
+  def merge_x_id(%Ecto.Query{} = query), do: merge_id(query, :x_id)
 
   def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
       when m in @rhs or m in @lhs or m in [Product, Order],
