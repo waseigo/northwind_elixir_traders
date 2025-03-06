@@ -266,6 +266,10 @@ defmodule NorthwindElixirTraders.Joins do
     end
   end
 
+  def merge_xy_ids(%Ecto.Query{from: %{source: {_table, xm}}} = query, ym)
+      when ym != xm and (xm in @lhs or xm in @rhs or xm in [Product, Order]),
+      do: query |> merge_x_id() |> merge_y_id(ym)
+
   def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
       when m in @rhs or m in @lhs or m in [Product, Order],
       do: select_merge(query, [o: o], %{order_id: o.id})
