@@ -508,31 +508,30 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
-  def query_order_revenues(xm, ym)
-      when (xm in @lhs and ym in @rhs) or (xm in @rhs and ym in @lhs) do
-    Joins.xy(xm, ym)
-    |> group_by([o: o], o.id)
-    |> select([x: x, o: o, od: od, p: p, y: y], %{
-      order_id: o.id,
-      date: o.date,
-      x_id: x.id,
-      y_id: y.id,
-      revenue: sum(od.quantity * p.price)
-    })
-  end
+  def query_order_revenues(xm, ym), do: query_order_metric(xm, ym, :revenue)
+  def query_order_revenues(), do: query_order_metric(Product, Order, :revenue)
 
-  def query_order_revenues(Product, Order), do: query_order_revenues()
-  def query_order_revenues(Order, Product), do: query_order_revenues()
+  def query_order_metric(xm, ym, metric)
+      when xm != ym and (xm in @lhs or xm in @rhs or xm in [Product, Order]) and
+             (ym in @lhs or ym in @rhs or ym in [Product, Order]) and
+             metric in [:revenue, :quantity],
+      do:
+        Joins.xy(xm, ym)
+        |> group_by([o: o], o.id)
+        |> Joins.merge_xy_ids(ym)
+        |> Joins.merge_order_id()
+        |> Joins.merge_order_date()
+        |> Joins.merge_metric(metric)
 
-  def query_order_revenues() do
-    Joins.xy(Product, Order)
-    |> group_by([o: o], o.id)
-    |> select([o: o, od: od, p: p], %{
-      order_id: o.id,
-      date: o.date,
-      revenue: sum(od.quantity * p.price)
-    })
-  end
+  # def query_order_metric(metric) when metric in [:revenue, :quantity],
+  #   do:
+  #     Joins.xy(Product, Order)
+  #     |> group_by([o: o], o.id)
+  #     |> select([o: o], %{
+  #       order_id: o.id,
+  #       date: o.date
+  #     })
+  #     |> Joins.merge_metric(metric)
 
   def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0 do
     query_order_revenues()
@@ -543,11 +542,11 @@ defmodule NorthwindElixirTraders.Insights do
     |> select([s], %{date: s.date, agg: avg(s.revenue) |> over(:part)})
   end
 
-  def rolling_agg_of_order_revenues(n, agg \\ :avg)
-      when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
-    agg_fn = fn x -> apply(Ecto.Query.WindowAPI, agg, [x]) end
+  # def rolling_agg_of_order_revenues(n, agg \\ :avg)
+  #     when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum, :count] do
+  #   agg_fn = fn x -> apply(Ecto.Query.WindowAPI, agg, [x]) end
 
-    d_agg = dynamic([s], agg_fn.(s.revenue) |> over(:part))
-    # …
-  end
+  #   d_agg = dynamic([s], agg_fn.(s.revenue) |> over(:part))
+  #   # …
+  # end
 end
