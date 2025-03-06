@@ -578,11 +578,13 @@ defmodule NorthwindElixirTraders.Insights do
       when is_integer(n) and n > 0 and is_list(opts) do
     agg = Keyword.get(opts, :agg, :sum)
     metric = Keyword.get(opts, :metric, :revenue)
+    date_opts = fetch_date_filter_opts(opts)
 
     query_order_metric(Product, Order, metric)
     |> subquery()
     |> window_sliding_by_order_date(n)
     |> select([s], %{date: s.date})
     |> Joins.merge_agg(agg, metric, :agg)
+    |> filter_by_date(date_opts)
   end
 end
