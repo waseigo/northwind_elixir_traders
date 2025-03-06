@@ -272,7 +272,18 @@ defmodule NorthwindElixirTraders.Joins do
 
   def merge_order_id(%Ecto.Query{from: %{source: {_table, m}}} = query)
       when m in @rhs or m in @lhs or m in [Product, Order],
-      do: select_merge(query, [o: o], %{order_id: o.id})
+      do:
+        if(has_named_binding?(query, :o),
+          do: select_merge(query, [o: o], %{order_id: o.id}),
+          else: query
+        )
+
+  def merge_order_date(%Ecto.Query{} = query),
+    do:
+      if(has_named_binding?(query, :o),
+        do: select_merge(query, [o: o], %{date: o.date}),
+        else: query
+      )
 
   def merge_metric(%Ecto.Query{} = query, :revenue),
     do: select_merge(query, [od: od, p: p], %{agg: sum(od.quantity * p.price)})
