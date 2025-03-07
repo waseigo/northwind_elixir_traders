@@ -587,4 +587,24 @@ defmodule NorthwindElixirTraders.Insights do
     |> Joins.merge_agg(agg, metric, :agg)
     |> filter_by_date(date_opts)
   end
+
+  def plot(data, opts \\ []) when is_list(data) and is_list(opts) do
+    scale = Keyword.get(opts, :scale, 80)
+    symbol = Keyword.get(opts, :symbol, "#")
+
+    data
+    |> Enum.each(fn %{date: x, agg: y} ->
+      xp = x |> DateTime.to_date() |> Date.to_string()
+      y_mx = Enum.max_by(data, & &1.agg) |> Map.get(:agg)
+      y_val = if is_float(y), do: Float.round(y, 2), else: y
+
+      yp =
+        (y / y_mx * scale)
+        |> round()
+        |> then(&Enum.reduce(1..&1, "", fn _, acc -> acc <> symbol end))
+        |> Kernel.<>(" (#{y_val})")
+
+      IO.puts("#{xp}\t#{yp}")
+    end)
+  end
 end
