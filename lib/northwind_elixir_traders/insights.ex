@@ -583,16 +583,18 @@ defmodule NorthwindElixirTraders.Insights do
       when is_integer(n) and n > 0 and agg in [:avg, :min, :max, :sum],
       do: rolling(n, agg: agg, metric: :revenue)
 
-  def rolling(n, opts)
+  def rolling(n, opts \\ [])
       when is_integer(n) and n > 0 and is_list(opts) do
     agg = Keyword.get(opts, :agg, :sum)
     metric = Keyword.get(opts, :metric, :revenue)
     date_opts = fetch_date_filter_opts(opts)
+    partition = Keyword.get(opts, :partition)
 
     query_order_metric(Product, Order, metric)
     |> subquery()
-    |> window_sliding_by_order_date(n)
+    |> window_sliding_by_order_date(n, partition: partition)
     |> select([s], %{date: s.date})
+    |> Joins.merge_from_subquery()
     |> Joins.merge_agg(agg, metric, :agg)
     |> filter_by_date(date_opts)
   end
