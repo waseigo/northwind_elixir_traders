@@ -568,6 +568,7 @@ defmodule NorthwindElixirTraders.Insights do
       |> Joins.merge_order_id()
       |> Joins.merge_order_date()
       |> Joins.merge_metric(metric)
+      |> distinct(true)
 
     name = Keyword.get(opts, :name)
 
@@ -596,7 +597,8 @@ defmodule NorthwindElixirTraders.Insights do
   def rolling(n, opts) when is_integer(n) and is_list(opts), do: rolling(Product, n, opts)
 
   def rolling(xm, n, opts \\ [])
-      when (xm in @rhs or xm in @lhs or xm == Product) and is_integer(n) and n > 0 and is_list(opts) do
+      when (xm in @rhs or xm in @lhs or xm == Product) and is_integer(n) and n > 0 and
+             is_list(opts) do
     agg = Keyword.get(opts, :agg, :sum)
     metric = Keyword.get(opts, :metric, :revenue)
     date_opts = fetch_date_filter_opts(opts)
