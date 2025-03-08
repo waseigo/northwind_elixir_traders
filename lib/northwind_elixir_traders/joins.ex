@@ -296,10 +296,10 @@ defmodule NorthwindElixirTraders.Joins do
       )
 
   def merge_metric(%Ecto.Query{} = query, :revenue),
-    do: select_merge(query, [od: od, p: p], %{agg: sum(od.quantity * p.price)})
+    do: select_merge(query, [od: od, p: p], %{agg: sum(od.quantity * p.price) |> over(:w)})
 
   def merge_metric(%Ecto.Query{} = query, :quantity),
-    do: select_merge(query, [od: od], %{agg: sum(od.quantity)})
+    do: select_merge(query, [od: od], %{agg: sum(od.quantity) |> over(:w)})
 
   def merge_from_subquery(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
     do: select_merge(query, [s], %{x_id: s.x_id, x_name: s.name, order_id: s.order_id})
