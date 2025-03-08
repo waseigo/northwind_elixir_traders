@@ -563,7 +563,7 @@ defmodule NorthwindElixirTraders.Insights do
              metric in [:revenue, :quantity] and is_list(opts) do
     q =
       Joins.xy(xm, ym)
-      |> group_by([o: o], o.id)
+      |> window_partition_by(xm, ym)
       |> Joins.merge_xy_ids(ym)
       |> Joins.merge_order_id()
       |> Joins.merge_order_date()
