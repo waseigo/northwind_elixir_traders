@@ -128,9 +128,6 @@ defmodule NorthwindElixirTraders.Joins do
 
   def merge_name(%Ecto.Query{from: %{source: {_table, m}}} = query), do: merge_name(query, m)
 
-  def merge_name(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
-    do: select_merge(query, [s], %{name: s.name})
-
   def module_to_assoc_field(m) when m in @tables do
     Module.split(m) |> List.last() |> String.downcase() |> String.to_atom()
   end
@@ -260,9 +257,6 @@ defmodule NorthwindElixirTraders.Joins do
       _ -> select(query, [x: x], %{{^field, x.id}})
     end
   end
-
-  def merge_x_id(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
-    do: select_merge(query, [s], %{x_id: s.x_id})
 
   def merge_x_id(%Ecto.Query{} = query), do: merge_id(query, :x_id)
 
