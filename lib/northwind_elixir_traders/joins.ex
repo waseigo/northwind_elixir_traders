@@ -261,6 +261,9 @@ defmodule NorthwindElixirTraders.Joins do
     end
   end
 
+  def merge_x_id(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
+    do: select_merge(query, [s], %{x_id: s.x_id})
+
   def merge_x_id(%Ecto.Query{} = query), do: merge_id(query, :x_id)
 
   def merge_y_id(%Ecto.Query{from: %{source: {_table, xm}}} = query, ym)
