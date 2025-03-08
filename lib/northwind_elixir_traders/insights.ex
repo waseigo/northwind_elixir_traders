@@ -545,27 +545,24 @@ defmodule NorthwindElixirTraders.Insights do
   def query_order_revenues(xm, ym), do: query_order_metric(xm, ym, :revenue)
   def query_order_revenues(), do: query_order_metric(Product, Order, :revenue)
 
-  def query_order_metric(xm, ym, metric)
+  def query_order_metric(xm, ym, metric, opts \\ [])
       when xm != ym and (xm in @lhs or xm in @rhs or xm in [Product, Order]) and
              (ym in @lhs or ym in @rhs or ym in [Product, Order]) and
-             metric in [:revenue, :quantity],
-      do:
-        Joins.xy(xm, ym)
-        |> group_by([o: o], o.id)
-        |> Joins.merge_xy_ids(ym)
-        |> Joins.merge_order_id()
-        |> Joins.merge_order_date()
-        |> Joins.merge_metric(metric)
+             metric in [:revenue, :quantity] and is_list(opts) do
+    q =
+      Joins.xy(xm, ym)
+      |> group_by([o: o], o.id)
+      |> Joins.merge_xy_ids(ym)
+      |> Joins.merge_order_id()
+      |> Joins.merge_order_date()
+      |> Joins.merge_metric(metric)
 
-  # def query_order_metric(metric) when metric in [:revenue, :quantity],
-  #   do:
-  #     Joins.xy(Product, Order)
-  #     |> group_by([o: o], o.id)
-  #     |> select([o: o], %{
-  #       order_id: o.id,
-  #       date: o.date
-  #     })
-  #     |> Joins.merge_metric(metric)
+    name = Keyword.get(opts, :name)
+
+    if xm == Customer and name == :country,
+      do: Joins.merge_name(q, xm, name),
+      else: Joins.merge_name(q)
+  end
 
   def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0,
     do: rolling_agg_of_order_revenues(:avg, n)
