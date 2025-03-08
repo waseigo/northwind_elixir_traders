@@ -582,8 +582,29 @@ defmodule NorthwindElixirTraders.Insights do
       {Product, Order} ->
         windows(query, [p: p, o: o], w: [partition_by: [p.id, o.id], order_by: [asc: o.date]])
 
+      {Order, Product} ->
+        windows(query, [o: o, p: p], w: [partition_by: [o.id, p.id], order_by: [asc: o.date]])
+
+      {Product, _} ->
+        windows(query, [p: p, y: y, o: o],
+          w: [partition_by: [p.id, y.id, o.id], order_by: [asc: o.date]]
+        )
+
+      {Order, _} ->
+        windows(query, [o: o, y: y], w: [partition_by: [o.id, y.id], order_by: [asc: o.date]])
+
+      {_, Product} ->
+        windows(query, [x: x, p: p, o: o],
+          w: [partition_by: [x.id, p.id, o.id], order_by: [asc: o.date]]
+        )
+
       {_, Order} ->
         windows(query, [x: x, o: o], w: [partition_by: [x.id, o.id], order_by: [asc: o.date]])
+
+      {_, _} ->
+        windows(query, [x: x, y: y, o: o],
+          w: [partition_by: [x.id, y.id, o.id], order_by: [asc: o.date]]
+        )
     end
   end
 
