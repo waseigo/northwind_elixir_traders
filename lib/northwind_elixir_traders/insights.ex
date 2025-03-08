@@ -603,8 +603,9 @@ defmodule NorthwindElixirTraders.Insights do
     metric = Keyword.get(opts, :metric, :revenue)
     date_opts = fetch_date_filter_opts(opts)
     partition = Keyword.get(opts, :partition)
+    name = Keyword.get(opts, :name)
 
-    query_order_metric(xm, Order, metric)
+    query_order_metric(xm, Order, metric, name: name)
     |> subquery()
     |> window_sliding_by_order_date(n, partition: partition)
     |> select([s], %{date: s.date})
