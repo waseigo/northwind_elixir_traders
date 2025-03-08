@@ -106,7 +106,9 @@ defmodule NorthwindElixirTraders.Joins do
           dynamic([o: o, c: c], fragment("? || ' - ' || ?", o.date, c.name))
       end
 
-    select_merge(query, [o: o, c: c], ^%{name: d_frag})
+    query
+    |> join(:inner, [o: o], c in assoc(o, :customer), as: :c)
+    |> select_merge([o: o, c: c], ^%{name: d_frag})
   end
 
   def merge_name(%Ecto.Query{} = query, m) when m == Employee,
