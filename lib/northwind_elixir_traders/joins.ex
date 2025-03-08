@@ -300,4 +300,7 @@ defmodule NorthwindElixirTraders.Joins do
 
   def merge_metric(%Ecto.Query{} = query, :quantity),
     do: select_merge(query, [od: od], %{agg: sum(od.quantity)})
+
+  def merge_from_subquery(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
+    do: select_merge(query, [s], %{x_id: s.x_id, x_name: s.name, order_id: s.order_id})
 end
