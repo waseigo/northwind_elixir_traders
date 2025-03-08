@@ -536,10 +536,22 @@ defmodule NorthwindElixirTraders.Insights do
     end
   end
 
-  def window_sliding_by_order_date(%Ecto.SubQuery{} = query, n \\ 7)
-      when is_integer(n) and n > 0 do
+  def window_sliding_by_order_date(%Ecto.SubQuery{} = query, n \\ 7, opts \\ [])
+      when is_integer(n) and n > 0 and is_list(opts) do
+    partition = Keyword.get(opts, :partition)
     d_frag = dynamic(fragment("ROWS ? PRECEDING", ^n - 1))
-    windows(query, [s], part: [order_by: [asc: s.date], frame: ^d_frag])
+
+    if is_nil(partition) do
+      windows(query, [s], part: [order_by: [asc: s.date], frame: ^d_frag])
+    else
+      case partition do
+        {:x, field} ->
+          d_part = dynamic([s], field(s, ^field))
+          d_order = [{:asc, dynamic([s], field(s, :date))}]
+
+          windows(query, [s], part: [partition_by: ^d_part, order_by: ^d_order, frame: ^d_frag])
+      end
+    end
   end
 
   def query_order_revenues(xm, ym), do: query_order_metric(xm, ym, :revenue)
