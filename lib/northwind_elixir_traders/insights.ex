@@ -504,20 +504,18 @@ defmodule NorthwindElixirTraders.Insights do
 
   def disagg_rows_by_field(rows, field \\ :name)
 
-  def disagg_rows_by_field(rows, field) when is_list(rows) and is_atom(field) do
-    Enum.reduce(rows, %{}, fn r, acc ->
-      Map.update(acc, r[field], [Map.delete(r, field)], &[Map.delete(r, field) | &1])
+  def disagg_rows_by_field(rows, field) when is_list(rows) and is_atom(field),
+    do: disagg_rows_by_field(rows, [field])
+
+  def disagg_rows_by_field(rows, [head | tail]) when is_list(rows) do
+    acc0 = Enum.group_by(rows, &Map.get(&1, head), &Map.delete(&1, head))
+
+    Enum.reduce(acc0, %{}, fn {k, rr}, acc ->
+      Map.put(acc, k, disagg_rows_by_field(rr, tail))
     end)
-    |> Enum.map(fn {field_key, disagg_rows} -> {field_key, Enum.reverse(disagg_rows)} end)
-    |> Map.new()
   end
 
-  def disagg_rows_by_field(rows, [k1, k2])
-      when is_list(rows) and is_atom(k1) and is_atom(k2) do
-    disagg_rows_by_field(rows, k1)
-    |> Enum.map(fn {k, r} -> {k, disagg_rows_by_field(r, k2)} end)
-    |> Map.new()
-  end
+  def disagg_rows_by_field(rows, []), do: rows
 
   def calculate_sum_of_max_running_totals(disaggregated) when is_map(disaggregated) do
     disaggregated
