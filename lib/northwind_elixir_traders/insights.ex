@@ -576,6 +576,16 @@ defmodule NorthwindElixirTraders.Insights do
       else: Joins.merge_name(q)
   end
 
+  def window_partition_by(%Ecto.Query{} = query, xm, ym) do
+    case {xm, ym} do
+      {Product, Order} ->
+        windows(query, [p: p, o: o], w: [partition_by: [p.id, o.id], order_by: [asc: o.date]])
+
+      {_, Order} ->
+        windows(query, [x: x, o: o], w: [partition_by: [x.id, o.id], order_by: [asc: o.date]])
+    end
+  end
+
   def rolling_avg_of_order_revenues(n \\ 7) when is_integer(n) and n > 0,
     do: rolling_agg_of_order_revenues(:avg, n)
 
