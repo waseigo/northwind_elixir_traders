@@ -661,4 +661,21 @@ defmodule NorthwindElixirTraders.Insights do
       IO.puts("#{xp}\t#{yp}")
     end)
   end
+
+  def query_timespan_cte() do
+    q_initial_select = from(o in Order, select: %{date: min(o.date)})
+    latest_date = from(o in Order, select: max(o.date)) |> Repo.one()
+
+    q_rcte =
+      from(ts in "timespan")
+      |> where([ts], ts.date < ^latest_date)
+      |> select([ts], %{date: fragment("datetime(? , '+1 day')", ts.date)})
+
+    q_union_all = union_all(q_initial_select, ^q_rcte)
+
+    from(ts in "timespan")
+    |> recursive_ctes(true)
+    |> with_cte("timespan", as: ^q_union_all)
+    |> select([ts], %{date: type(ts.date, :utc_datetime)})
+  end
 end
