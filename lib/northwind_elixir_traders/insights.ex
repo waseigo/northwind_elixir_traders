@@ -669,7 +669,9 @@ defmodule NorthwindElixirTraders.Insights do
     q_rcte =
       from(ts in "timespan")
       |> where([ts], ts.date < ^latest_date)
-      |> select([ts], %{date: fragment("datetime(? , '+1 day')", ts.date)})
+      |> select([ts], %{
+        date: fragment("strftime('%Y-%m-%dT%H:%M:%SZ', datetime(? , '+1 day'))", ts.date)
+      })
 
     q_union_all = union_all(q_initial_select, ^q_rcte)
 
