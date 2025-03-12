@@ -311,10 +311,11 @@ defmodule NorthwindElixirTraders.Joins do
   def merge_from_subquery(%Ecto.Query{from: %{source: %Ecto.SubQuery{}}} = query),
     do: select_merge(query, [s], %{x_id: s.x_id, x_name: s.name, order_id: s.order_id})
 
-  def provide_all_dates(%Ecto.Query{} = query) do
+  def provide_all_dates(%Ecto.Query{} = query, agg_field) when is_atom(agg_field) do
     from(ts in subquery(Insights.query_timespan_cte()), as: :ts)
     |> join(:left, [ts: ts], s in subquery(query), on: ts.date == s.date, as: :s)
-    |> select([s: s], s)
+    |> select([s: s], %{date: s.date})
+    |> select_merge([s: s], %{{^agg_field, field(s, ^agg_field)}})
     |> select_merge([ts: ts], %{date: ts.date})
   end
 end
