@@ -78,7 +78,14 @@ defmodule NorthwindElixirTraders.Joins do
     do: p_od_group_and_select(m) |> Insights.filter_by_date(opts)
 
   def p_od_group_and_select(m) when m in @lhs or m in @rhs or m in [Product, Order],
-    do: to_p_od_and_group(m) |> merge_id() |> merge_quantity_revenue() |> merge_name()
+    do:
+      m
+      |> to_p_od_and_group()
+      |> merge_id()
+      |> merge_quantity_revenue()
+      |> merge_name()
+      |> merge_order_id()
+      |> merge_order_date()
 
   def merge_quantity_revenue(%Ecto.Query{} = query),
     do:
