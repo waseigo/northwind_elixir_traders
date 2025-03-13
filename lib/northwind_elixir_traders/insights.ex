@@ -577,6 +577,25 @@ defmodule NorthwindElixirTraders.Insights do
       |> Joins.merge_metric(metric)
       |> distinct(true)
 
+    by_date? = Keyword.get(opts, :by_date, false)
+
+    q =
+      if by_date? do
+        case {xm, ym} do
+          {Product, Order} -> group_by(q, [p: p, o: o], [p.id, o.date])
+          {Product, _} -> group_by(q, [p: p, o: o, y: y], [p.id, y.id, o.date])
+          {_, Order} -> group_by(q, [x: x, o: o], [x.id, o.date])
+          {_, _} -> group_by(q, [x: x, y: y, o: o], [x.id, y.id, o.date])
+        end
+      else
+        case {xm, ym} do
+          {Product, Order} -> group_by(q, [p: p, o: o], [p.id, o.id])
+          {Product, _} -> group_by(q, [p: p, y: y], [p.id, y.id])
+          {_, Order} -> group_by(q, [x: x, o: o], [x.id, o.id])
+          {_, _} -> group_by(q, [x: x, y: y], [x.id, y.id])
+        end
+      end
+
     name = Keyword.get(opts, :name)
 
     if xm == Customer and name == :country,
