@@ -94,6 +94,14 @@ defmodule NorthwindElixirTraders.Joins do
         revenue: sum(p.price * od.quantity)
       })
 
+  def merge_quantity_revenue(%Ecto.Query{} = query, agg_field) when is_atom(agg_field) do
+    d_agg = dynamic([ts], sum(coalesce(field(ts, ^agg_field), 0)))
+    select_merge(query, [ts], ^%{{agg_field, d_agg}})
+  end
+
+  def aggregate_subquery_by_date(%Ecto.Query{} = query),
+    do: subquery(query) |> group_by([ts], ts.date) |> select([ts], %{date: ts.date})
+
   def merge_name(%Ecto.Query{} = query, m, field) when m == Customer and field == :country,
     do: select_merge(query, [x: x], %{name: x.country})
 
