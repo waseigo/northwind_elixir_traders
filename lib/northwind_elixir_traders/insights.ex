@@ -672,7 +672,9 @@ defmodule NorthwindElixirTraders.Insights do
       y_val = if is_float(y), do: Float.round(y, 2), else: y
 
       scaled = (y / y_mx * scale) |> round() |> max(0)
-      yp = if scaled > 0, do: String.duplicate(symbol, scaled) <> " (#{y_val})", else: "(#{y_val})"
+
+      yp =
+        if scaled > 0, do: String.duplicate(symbol, scaled) <> " (#{y_val})", else: "(#{y_val})"
 
       IO.puts("#{xp}\t#{yp}")
     end)
