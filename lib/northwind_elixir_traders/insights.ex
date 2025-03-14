@@ -671,11 +671,8 @@ defmodule NorthwindElixirTraders.Insights do
       y_mx = Enum.max_by(data, & &1.agg) |> Map.get(:agg)
       y_val = if is_float(y), do: Float.round(y, 2), else: y
 
-      yp =
-        (y / y_mx * scale)
-        |> round()
-        |> then(&Enum.reduce(1..&1, "", fn _, acc -> acc <> symbol end))
-        |> Kernel.<>(" (#{y_val})")
+      scaled = (y / y_mx * scale) |> round() |> max(0)
+      yp = if scaled > 0, do: String.duplicate(symbol, scaled) <> " (#{y_val})", else: "(#{y_val})"
 
       IO.puts("#{xp}\t#{yp}")
     end)
