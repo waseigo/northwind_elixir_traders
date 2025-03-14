@@ -20,9 +20,9 @@ Love this book? Found a mistake? Have a request for a next edition? Contact me [
 
 ### Who is this book for?
 
-[The book](https://leanpub.com/northwind-elixir-traders) has been written for anyone who wants to learn Elixir by practicing on an ambitious project, and anyone who already possesses some Elixir programming skill and basic knowledge of relational databases, and wants to understand Ecto better to a degree that will allow them to model any kind of data with these two technologies.
+[The book](https://leanpub.com/northwind-elixir-traders) has been written for anyone who wants to learn Elixir by practicing on an ambitious project, and anyone who already possesses some Elixir programming skill and basic knowledge of relational databases, and wants to understand Ecto better to a degree that will allow them to model any kind of data with these technologies.
 
-You will learn about incrementally converting a database schema to Ecto structures and writing the code necessary to manage the data therein, gradually (and retroactively, and iteratively) refining the database model with constraints, changesets and associations and helper functions, and working with dynamic repositories to import, validate and sanitize data, and making queries to generate insights.
+You will learn about incrementally converting a database schema to Ecto structures and writing the code necessary to manage the data therein, gradually (and retroactively, and iteratively) refining the database model with constraints, changesets and associations and helper functions, and working with dynamic repositories to import, validate and sanitize data, and making simple and complex queries to generate insights.
 
 ### What knowledge is required to get started?
 
@@ -95,3 +95,12 @@ The entirety of [the book](https://leanpub.com/northwind-elixir-traders) has bee
 [The book](https://leanpub.com/northwind-elixir-traders) contains hundreds of code snippets that are used to explore Ecto's features in IEx and SQLite's functionality using the `sqlite3` binary. It also contains hundreds of code blocks with titles. Every such code block in the book corresponds to a commit in this git repo, with the title of the block as the commit message. Some commits do not correspond to titled code blocks, but to instructions to make modifications to the code. The are also commits that are unrelated to the book's content, such as changes due to a `mix format`, corrections, etc.
 
 Ideally, you will build the `NorthwindElixirTraders` application from scratch while following [the book](https://leanpub.com/northwind-elixir-traders). The codebase has been published for reference and to make copy-paste easier than from the PDF, as the book has been deliberately written to not pursue the "happy path".
+
+### Software versions used
+
+- **Elixir:** version 1.18.2, installed using the [asdf version manager](https://asdf-vm.com/guide/getting-started.html). Initially, the code in the book was developed with version 1.14.0 from the [`elixir` package for Debian 12](https://packages.debian.org/bookworm/elixir). Either will work to progress through the book, except for places where [`Enum.sum_by/2`](https://hexdocs.pm/elixir/Enum.html#sum_by/2) is used, which is available starting from version 1.18.0, and the functions [`DateTime.before?/2`](https://hexdocs.pm/elixir/DateTime.html#before?/2), [`DateTime.after?/2`](https://hexdocs.pm/elixir/DateTime.html#after?/2), [`Date.before?/2`](https://hexdocs.pm/elixir/Date.html#before?/2), and [`Date.after?/2`](https://hexdocs.pm/elixir/Date.html#after?/2), which are available starting from version 1.15.0. In any case, I strongly recommend installing Elixir 1.18.2 (the current version at the time of this writing), since the new typing features also make debugging easier.
+- **Ecto:** [version 3.12.5](https://hex.pm/packages/ecto/3.12.5).
+- **Ecto SQLite3:** version 0.18.1 from Hex.pm.
+- **SQLite:** version 3.40.1 from the [`sqlite3` package for Debian 12](https://packages.debian.org/bookworm/sqlite3).
+
+To my knowledge, nothing above is specific to Debian 12 or Linux, and you should be able to work through this book on any popular operating system and CPU architecture of your choice. Since early 2025, and while polishing the book for its 100%-ready release, I have "replayed" the book and all code snippers executed in IEx with the versions mentioned above. To the date of this release, the replay has concluded for the entirety of the book. Should you face any issues. Should anything not work as expected up to that chapter, kindly contact me so that I can publish a new release with corrections.
