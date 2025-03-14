@@ -699,4 +699,62 @@ defmodule NorthwindElixirTraders.Insights do
     |> with_cte("timespan", as: ^q_union_all)
     |> select([ts], %{date: type(ts.date, :utc_datetime)})
   end
+
+  def prepare_window_query_with_rcte(xm, ym, opts \\ []) do
+    metric = Keyword.get(opts, :metric, :revenue)
+    date_opts = fetch_date_filter_opts(opts)
+
+    q_order_metric =
+      query_order_metric(xm, ym, metric, by_date: true)
+      |> filter_by_date(date_opts)
+      |> Joins.merge_name()
+      |> select_merge([y: y], %{y_name: y.name})
+
+    q_all_xy_ids =
+      Joins.xy(xm, ym)
+      |> select([x: x, y: y, o: o], %{x_id: x.id, y_id: y.id, date: o.date})
+      |> filter_by_date(date_opts)
+      |> Joins.merge_name()
+      |> select_merge([y: y], %{y_name: y.name})
+      |> subquery()
+      |> select([s], %{x_id: s.x_id, y_id: s.y_id, x_name: s.name, y_name: s.y_name})
+      |> distinct(true)
+
+    from(xy in subquery(q_all_xy_ids), as: :xy)
+    |> join(:cross, [xy: xy], ts in subquery(query_timespan_cte() |> filter_by_date(date_opts)),
+      as: :ts
+    )
+    |> join(:left, [xy: xy, ts: ts], s in subquery(q_order_metric),
+      on: ts.date == s.date and xy.x_id == s.x_id and xy.y_id == s.y_id,
+      as: :s
+    )
+    |> select([xy: xy, ts: ts, s: s], %{
+      date: ts.date,
+      x_id: xy.x_id,
+      y_id: xy.y_id,
+      agg: coalesce(s.agg, 0),
+      x_name: xy.x_name,
+      y_name: xy.y_name
+    })
+  end
+
+  def running_total_by_date(xm, ym, opts \\ []),
+    do:
+      prepare_window_query_with_rcte(xm, ym, opts)
+      |> subquery()
+      |> windows([s], w: [partition_by: [s.x_id, s.y_id], order_by: [asc: s.date]])
+      |> select([s], s)
+      |> select_merge([s], %{agg: sum(coalesce(s.agg, 0)) |> over(:w)})
+
+  def rolling_avg_by_date(xm, ym, n, opts \\ []) when is_integer(n) and n > 0 do
+    d_frag = dynamic(fragment("ROWS ? PRECEDING", ^n - 1))
+
+    prepare_window_query_with_rcte(xm, ym, opts)
+    |> subquery()
+    |> windows([s], w: [partition_by: [s.x_id, s.y_id], order_by: [asc: s.date], frame: ^d_frag])
+    |> select([s], s)
+    |> select_merge([s], %{agg: avg(coalesce(s.agg, 0)) |> over(:w)})
+  end
+
+  def static_by_date(xm, ym, opts \\ []), do: prepare_window_query_with_rcte(xm, ym, opts)
 end
