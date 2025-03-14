@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Isaak Tsalicoglou <isaak@overbring.com>
+# SPDX-License-Identifier: Apache-2.0
+
 defmodule NorthwindElixirTraders.DataImporter do
   require Logger
   alias NorthwindElixirTraders.{Repo, Country}

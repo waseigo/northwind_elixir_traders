@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Isaak Tsalicoglou <isaak@overbring.com>
+# SPDX-License-Identifier: Apache-2.0
+
 alias NorthwindElixirTraders.{Repo,Category,Employee,Supplier,Product,Validations,DataImporter,Shipper,PhoneNumbers,Country,Customer,Order,OrderDetail,Insights, Joins}
 
 import Ecto.{Query,Changeset}
