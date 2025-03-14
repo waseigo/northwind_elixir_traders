@@ -28,3 +28,5 @@ northwind_elixir_traders-*.tar
 # The SQL statements are here: https://en.wikiversity.org/wiki/Database_Examples/Northwind/SQLite
 # And also archived here: https://archive.is/KatmG
 nt.sql
+
+.vscode
