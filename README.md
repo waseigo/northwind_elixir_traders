@@ -1,8 +1,10 @@
 # Northwind Elixir Traders
 
-**Learn Elixir and database modeling with Ecto and SQLite, all in one project**
+### Learn Elixir and database modeling with Ecto and SQLite, all in one project
 
-This is the source code of the book by [Isaak Tsalicoglou](https://overbring.com/about). The book is available for purchase [on Leanpub](https://leanpub.com/northwind-elixir-traders).
+This is the source code of the book by [Isaak Tsalicoglou](https://overbring.com/about). The book (approx. 500 pages) is available for purchase [on Leanpub](https://leanpub.com/northwind-elixir-traders).
+
+![Northwind Elixir Traders book cover](./etc/northwind-elixir-traders-cover.jpg)
 
 ## What is "Northwind Elixir Traders"?
 
@@ -67,7 +69,7 @@ SQLite has been chosen in order to "spice things up" compared to Ecto's out-of-t
 
 ### What makes this book special?
 
-This _isn't_ your typical Elixir or Ecto tutorial--instead of pursuing the usual "happy path" reflected in its official documentation and "Getting Started" guide, we'll dive into the complexities and nuances of database implementation for business purposes, offering a refreshing exploration that goes beyond the ordinary and the expected.
+[Northwind Elixir Traders](https://leanpub.com/northwind-elixir-traders) _isn't_ your typical Elixir or Ecto tutorial--instead of pursuing the usual "happy path" reflected in its official documentation and "Getting Started" guide, we'll dive into the complexities and nuances of database implementation for business purposes, offering a refreshing exploration that goes beyond the ordinary and the expected.
 
 Our adventure begins by embracing the simplicity of SQLite over the conventional choice of PostgreSQL. This deliberate trade-off in favor of simplicity against feature-completeness introduces challenges and roadblocks that will enrich your learning experience as we navigate the intricacies of schema design, migrations, primary and foreign keys, constraints and validation functions, relational structures between the different tables, importing data from existing databases, and executing queries that return meaningful insights.
 
